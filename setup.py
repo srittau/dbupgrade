@@ -13,5 +13,5 @@ setup(
     packages=["dbupgrade"],
     scripts=["bin/dbupgrade"],
     install_requires=[],
-    tests_require=[],
+    tests_require=["asserts>=0.8.1,<0.9"],
 )
