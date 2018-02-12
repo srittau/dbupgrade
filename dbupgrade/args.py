@@ -1,18 +1,29 @@
 from argparse import ArgumentParser, Namespace
-from typing import Sequence
+from typing import Sequence, Optional
 
 
 class Arguments:
 
-    def __init__(self, args: Namespace) -> None:
-        self.schema = args.schema
-        self.db_url = args.db_url
-        self.script_path = args.script_path
-        self.has_explicit_api_level = args.api_level is not None
-        self.api_level = args.api_level or 0
-        self.ignore_api_level = args.ignore_api_level
-        self.has_max_version = args.max_version is not None
-        self.max_version = args.max_version or 0
+    def __init__(self, schema: str, db_url: str, script_path: str,
+                 api_level: Optional[int], max_version: Optional[int],
+                 ignore_api_level: bool = False) -> None:
+        if ignore_api_level and api_level is not None:
+            raise ValueError(
+                "ignore_api_level and api_level are mutually exclusive")
+        self.schema = schema
+        self.db_url = db_url
+        self.script_path = script_path
+        self.has_explicit_api_level = api_level is not None
+        self.api_level = api_level or 0
+        self.ignore_api_level = ignore_api_level
+        self.has_max_version = max_version is not None
+        self.max_version = max_version or 0
+
+
+def arguments_from_args(args: Namespace) -> Arguments:
+    return Arguments(
+        args.schema, args.db_url, args.script_path, args.api_level,
+        args.max_version, args.ignore_api_level)
 
 
 def parse_args(argv: Sequence[str]) -> Arguments:
@@ -30,4 +41,4 @@ def parse_args(argv: Sequence[str]) -> Arguments:
     parser.add_argument(
         "-m", "--max-version", help="maximum version to upgrade to", type=int)
     args = parser.parse_args(argv[1:])
-    return Arguments(args)
+    return arguments_from_args(args)
