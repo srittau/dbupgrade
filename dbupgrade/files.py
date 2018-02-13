@@ -1,3 +1,5 @@
+import os.path
+from os import listdir
 from typing import List
 
 
@@ -21,4 +23,5 @@ class FileInfo:
 
 
 def collect_sql_files(directory: str) -> List[str]:
-    raise NotImplementedError("collect_sql_files()")
+    return [os.path.join(directory, fn) for fn
+            in listdir(directory) if fn.endswith(".sql")]
