@@ -1,7 +1,7 @@
-from typing import Tuple, Any, Optional, List
+from typing import Tuple, Any, Optional, List, IO
 
 from sqlalchemy import create_engine, text as sa_text
-from sqlalchemy.engine import Engine, ResultProxy, RowProxy
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 
 SQL_CREATE_DB_CONFIG = """
@@ -94,3 +94,8 @@ def _insert_default_version_info(engine: Engine, schema: str) -> None:
     quote_char = _quote_char(engine)
     query = sa_text(SQL_INSERT_DEFAULT_VERSIONS.format(quote=quote_char))
     engine.execute(query, schema=schema)
+
+
+def execute_stream(db_url: str, stream: IO[str], schema: str, version: int,
+                   api_level: int) -> None:
+    raise NotImplementedError()
