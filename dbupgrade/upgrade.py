@@ -6,7 +6,7 @@ from dbupgrade.args import Arguments
 from dbupgrade.db import fetch_current_db_versions
 from dbupgrade.files import FileInfo, collect_sql_files
 from dbupgrade.filter import Filter, filter_from_arguments
-from dbupgrade.sql import parse_sql_files
+from dbupgrade.sql_file import parse_sql_files
 
 
 def db_upgrade(args: Arguments) -> None:

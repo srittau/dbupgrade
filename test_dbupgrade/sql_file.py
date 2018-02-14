@@ -7,7 +7,7 @@ from unittest.mock import patch, mock_open, call, ANY
 from asserts import assert_equal, assert_raises_regex
 
 from dbupgrade.files import FileInfo
-from dbupgrade.sql import parse_sql_files, ParseError, parse_sql_stream
+from dbupgrade.sql_file import parse_sql_files, ParseError, parse_sql_stream
 
 
 class ParseSQLFilesTest(TestCase):
@@ -26,8 +26,9 @@ class ParseSQLFilesTest(TestCase):
             assert_equal("file content", stream.read())
             return file_info
 
-        with patch("dbupgrade.sql.open", mock_open(read_data="file content")):
-            with patch("dbupgrade.sql.parse_sql_stream") as parse_stream:
+        with patch("dbupgrade.sql_file.open",
+                   mock_open(read_data="file content")):
+            with patch("dbupgrade.sql_file.parse_sql_stream") as parse_stream:
                 parse_stream.side_effect = my_parse_stream
                 files = parse_sql_files(["foo", "bar"])
                 parse_stream.assert_has_calls(
@@ -36,9 +37,11 @@ class ParseSQLFilesTest(TestCase):
 
     def test_skip_files_with_parse_errors(self) -> None:
         file_info = self._create_file_info()
-        with patch("dbupgrade.sql.open", mock_open(read_data="file content")):
-            with patch("dbupgrade.sql.logging") as logging:
-                with patch("dbupgrade.sql.parse_sql_stream") as parse_stream:
+        with patch("dbupgrade.sql_file.open",
+                   mock_open(read_data="file content")):
+            with patch("dbupgrade.sql_file.logging") as logging:
+                with patch(
+                        "dbupgrade.sql_file.parse_sql_stream") as parse_stream:
                     parse_stream.side_effect = \
                         [ParseError("test error"), file_info]
                     files = parse_sql_files(
