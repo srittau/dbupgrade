@@ -18,9 +18,9 @@ setup(
     author_email="srittau@rittau.biz",
     url="https://github.com/srittau/dbupgrade",
     packages=["dbupgrade"],
-    scripts=["bin/dbupgrade"],
-    install_requires=["sqlalchemy>=1.0"],
-    tests_require=["asserts>=0.8.1,<0.9"],
+    scripts=[os.path.join("bin", "dbupgrade")],
+    install_requires=["sqlalchemy >= 1.0"],
+    tests_require=["asserts >= 0.8.1, < 0.9"],
     license="MIT",
     classifiers=[
         "Development Status :: 4 - Beta",
