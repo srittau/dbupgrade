@@ -145,16 +145,17 @@ class ExecuteStreamTest(TestCase):
         self._create_engine_patch = patch("dbupgrade.db.create_engine")
         self._create_engine = self._create_engine_patch.start()
         self._create_engine.return_value.dialect.name = "sqlite"
-        self._execute = self._create_engine.return_value.begin.return_value. \
-            __enter__.return_value.execute
+        self._conn = self._create_engine.return_value.begin. \
+            return_value.__enter__.return_value
+        self._execute = self._conn.execute
 
     def tearDown(self) -> None:
         self._create_engine.stop()
 
-    def _assert_execute_has_calls(self, expected_queries: Sequence[Any]) \
-            -> None:
-        assert_equal(len(expected_queries), len(self._execute.call_args_list))
-        for c, ca in zip(expected_queries, self._execute.call_args_list):
+    def _assert_execute_has_calls(
+            self, execute_mock: Mock, expected_queries: Sequence[Any]) -> None:
+        assert_equal(len(expected_queries), len(execute_mock.call_args_list))
+        for c, ca in zip(expected_queries, execute_mock.call_args_list):
             cac = call(str(ca[0][0]), **ca[1])
             assert_equal(c, cac)
 
@@ -173,14 +174,22 @@ class ExecuteStreamTest(TestCase):
                            "myschema", 44, 13)
         self._create_engine.return_value.dispose.assert_called_once()
 
-    def test_execute(self) -> None:
+    def test_execute_with_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         execute_stream("sqlite:///", StringIO(sql),
-                       "myschema", 44, 13)
+                       "myschema", 44, 13, transaction=True)
+        self._conn.execution_options.assert_not_called()
         update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
-        self._assert_execute_has_calls([
+        self._assert_execute_has_calls(self._execute, [
             call("SELECT * FROM foo"),
             call("SELECT * FROM bar"),
             call(update_sql, schema="myschema", version=44, api_level=13),
         ])
         assert_is_instance(self._execute.call_args_list[2][0][0], TextClause)
+
+    def test_execute_without_transaction(self) -> None:
+        sql = "SELECT * FROM foo; SELECT * FROM bar;"
+        execute_stream("sqlite:///", StringIO(sql),
+                       "myschema", 44, 13, transaction=False)
+        self._conn.execution_options.assert_called_with(
+            isolation_level="AUTOCOMMIT")

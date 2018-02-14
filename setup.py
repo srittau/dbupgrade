@@ -11,7 +11,7 @@ def read(filename):
 
 setup(
     name="dbupgrade",
-    version="0.1.0",
+    version="0.2.0",
     description="Database Migration Tool",
     long_description=read("README.rst"),
     author="Sebastian Rittau",

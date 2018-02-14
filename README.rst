@@ -42,6 +42,13 @@ The following headers are required:
     equal or higher by one than the API level of the preceding version. For
     example, if script version 44 has API level 3, script version 45 must
     have API level 3 or 4.
+:Transaction:
+    (optional) Possible values are ``yes`` (default) and ``no``. When this
+    header is yes, all statements of a single upgrade file and the
+    corresponding version upgrade statements are executed within a single
+    transaction. Otherwise each statement is executed separately. The former
+    is usually preferable so that all changes will be rolled back if a
+    script fails to apply, but the latter is required in some cases.
 
 The database must contain a table ``db_config`` with three columns: ``schema``,
 ``version``, and ``api_level``. If this table does not exist, it is created.

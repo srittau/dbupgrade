@@ -27,33 +27,26 @@ def _parse_sql_file(filename: str) -> FileInfo:
 
 
 def parse_sql_stream(stream: IO[str], filename: str) -> FileInfo:
-    headers = parse_sql_headers(stream)
+    headers = _parse_sql_headers(stream)
     try:
         schema = headers["schema"]
         dialect = headers["dialect"]
-        version_str = headers["version"]
-        api_level_str = headers["api-level"]
+        version = _int_header(headers, "version")
+        api_level = _int_header(headers, "api-level")
     except KeyError as exc:
         raise ParseError(f"missing header: {exc.args[0]}") from None
 
-    def to_int(string: str, header_name: str) -> int:
-        try:
-            return int(string)
-        except ValueError:
-            raise ParseError(
-                f"header is not an integer: {header_name}") from None
-
-    version = to_int(version_str, "version")
-    api_level = to_int(api_level_str, "api-level")
-
-    return FileInfo(filename, schema, dialect, version, api_level)
+    info = FileInfo(filename, schema, dialect, version, api_level)
+    if "transaction" in headers:
+        info.transaction = _bool_header(headers, "transaction")
+    return info
 
 
 _line_re = re.compile(r"^--\s+((?:[a-zA-Z][a-zA-Z0-9]*)"
                       r"(?:-[a-zA-Z][a-zA-Z0-9]*)*):\s+(.*)$")
 
 
-def parse_sql_headers(stream: IO[str]) -> Dict[str, str]:
+def _parse_sql_headers(stream: IO[str]) -> Dict[str, str]:
     matches = []
     for line in stream:
         m = _line_re.match(line)
@@ -61,3 +54,24 @@ def parse_sql_headers(stream: IO[str]) -> Dict[str, str]:
             break
         matches.append(m)
     return dict((m.group(1).lower(), m.group(2).strip()) for m in matches)
+
+
+def _bool_header(headers: Dict[str, str], header_name: str) -> bool:
+    _BOOL_VALUES = {
+        "yes": True,
+        "no": False,
+    }
+
+    try:
+        return _BOOL_VALUES[headers[header_name]]
+    except KeyError:
+        raise ParseError(
+            f"header must be 'yes' or 'no': {header_name}") from None
+
+
+def _int_header(headers: Dict[str, str], header_name: str) -> int:
+    try:
+        return int(headers[header_name])
+    except ValueError:
+        raise ParseError(
+            f"header is not an integer: {header_name}") from None

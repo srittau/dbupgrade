@@ -26,11 +26,22 @@ class ApplyFileTest(TestCase):
         apply_file("sqlite:///", info)
         self._logging.info.assert_called_once_with("applying #45 (API level 3)")
 
-    def test_execute(self) -> None:
+    def test_execute__with_transaction(self) -> None:
         stream = StringIO("")
         self._open.return_value = stream
         info = FileInfo("/foo/bar", "myschema", "sqlite", 45, 3)
+        info.transaction = True
         apply_file("sqlite:///", info)
         self._open.assert_called_once_with("/foo/bar", "r")
         self._execute_stream.assert_called_once_with(
-            "sqlite:///", stream, "myschema", 45, 3)
+            "sqlite:///", stream, "myschema", 45, 3, transaction=True)
+
+    def test_execute__without_transaction(self) -> None:
+        stream = StringIO("")
+        self._open.return_value = stream
+        info = FileInfo("/foo/bar", "myschema", "sqlite", 45, 3)
+        info.transaction = False
+        apply_file("sqlite:///", info)
+        self._open.assert_called_once_with("/foo/bar", "r")
+        self._execute_stream.assert_called_once_with(
+            "sqlite:///", stream, "myschema", 45, 3, transaction=False)

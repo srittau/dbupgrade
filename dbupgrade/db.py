@@ -1,4 +1,4 @@
-from typing import Tuple, Any, Optional, List, IO
+from typing import Tuple, Any, Optional, List, IO, Union
 
 from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Engine, Connection
@@ -104,11 +104,19 @@ def _insert_default_version_info(engine: Engine, schema: str) -> None:
 
 
 def execute_stream(db_url: str, stream: IO[str], schema: str, version: int,
-                   api_level: int) -> None:
+                   api_level: int, *, transaction: bool = True) -> None:
     with _EngineContext(db_url) as engine:
         with engine.begin() as conn:
-            _execute_sql_stream(conn, stream)
-            _update_versions(conn, schema, version, api_level)
+            if not transaction:
+                conn.execution_options(isolation_level="AUTOCOMMIT")
+            _execute_stream_in_conn(conn, stream, schema, version, api_level)
+
+
+def _execute_stream_in_conn(
+        conn: Connection, stream: IO[str], schema: str,
+        version: int, api_level: int) -> None:
+    _execute_sql_stream(conn, stream)
+    _update_versions(conn, schema, version, api_level)
 
 
 def _execute_sql_stream(conn: Connection, stream: IO[str]) -> None:

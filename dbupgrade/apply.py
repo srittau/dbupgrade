@@ -15,4 +15,5 @@ def apply_file(db_url: str, file_info: FileInfo) -> None:
         f"applying #{file_info.version} (API level {file_info.api_level})")
     with open(file_info.filename, "r") as stream:
         execute_stream(db_url, stream, file_info.schema,
-                       file_info.version, file_info.api_level)
+                       file_info.version, file_info.api_level,
+                       transaction=file_info.transaction)

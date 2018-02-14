@@ -12,6 +12,7 @@ class FileInfo:
         self.dialect = dialect
         self.version = version
         self.api_level = api_level
+        self.transaction = True
 
     def __lt__(self, other: "FileInfo") -> bool:
         if self.schema != other.schema or self.dialect != other.dialect:
