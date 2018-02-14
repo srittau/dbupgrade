@@ -3,7 +3,8 @@ from typing import Any, Sequence
 from unittest import TestCase
 from unittest.mock import patch, call, Mock
 
-from asserts import assert_true, assert_equal, assert_raises
+from asserts import assert_true, assert_equal, assert_raises, \
+    assert_is_instance
 
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.elements import TextClause
@@ -182,3 +183,4 @@ class ExecuteStreamTest(TestCase):
             call("SELECT * FROM bar"),
             call(update_sql, schema="myschema", version=44, api_level=13),
         ])
+        assert_is_instance(self._execute.call_args_list[2][0][0], TextClause)

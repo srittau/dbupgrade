@@ -119,5 +119,5 @@ def _execute_sql_stream(conn: Connection, stream: IO[str]) -> None:
 
 def _update_versions(conn: Connection, schema: str, version: int,
                      api_level: int) -> None:
-    query = SQL_UPDATE_VERSIONS.format(quote=_quote_char(conn.engine))
+    query = sa_text(SQL_UPDATE_VERSIONS.format(quote=_quote_char(conn.engine)))
     conn.execute(query, schema=schema, version=version, api_level=api_level)
