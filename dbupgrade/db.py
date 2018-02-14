@@ -1,8 +1,10 @@
 from typing import Tuple, Any, Optional, List, IO
 
 from sqlalchemy import create_engine, text as sa_text
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Engine, Connection
 from sqlalchemy.exc import SQLAlchemyError
+
+from dbupgrade.sql import split_sql
 
 SQL_CREATE_DB_CONFIG = """
     CREATE TABLE db_config(
@@ -20,6 +22,11 @@ SQL_SELECT_VERSIONS = """
 SQL_INSERT_DEFAULT_VERSIONS = """
     INSERT INTO db_config({quote}schema{quote}, version, api_level)
         VALUES(:schema, -1, 0)
+"""
+
+SQL_UPDATE_VERSIONS = """
+    UPDATE db_config SET version = :version, api_level = :api_level
+        WHERE {quote}schema{quote} = :schema
 """
 
 
@@ -42,7 +49,7 @@ class _EngineContext:
         self._engine: Optional[Engine] = None
 
     def __enter__(self) -> Engine:
-        self._engine = create_engine(self._db_url)
+        self._engine = create_engine(self._db_url, convert_unicode=True)
         return self._engine
 
     def __exit__(self, _: Any, __: Any, ___: Any) -> None:
@@ -98,4 +105,19 @@ def _insert_default_version_info(engine: Engine, schema: str) -> None:
 
 def execute_stream(db_url: str, stream: IO[str], schema: str, version: int,
                    api_level: int) -> None:
-    raise NotImplementedError()
+    with _EngineContext(db_url) as engine:
+        with engine.begin() as conn:
+            _execute_sql_stream(conn, stream)
+            _update_versions(conn, schema, version, api_level)
+
+
+def _execute_sql_stream(conn: Connection, stream: IO[str]) -> None:
+    """Run the SQL statements in a stream against a database."""
+    for query in split_sql(stream):
+        conn.execute(query)
+
+
+def _update_versions(conn: Connection, schema: str, version: int,
+                     api_level: int) -> None:
+    query = SQL_UPDATE_VERSIONS.format(quote=_quote_char(conn.engine))
+    conn.execute(query, schema=schema, version=version, api_level=api_level)

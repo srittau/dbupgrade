@@ -1,3 +1,4 @@
+from io import StringIO
 from typing import Any, Sequence
 from unittest import TestCase
 from unittest.mock import patch, call, Mock
@@ -7,8 +8,10 @@ from asserts import assert_true, assert_equal, assert_raises
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.elements import TextClause
 
-from dbupgrade.db import fetch_current_db_versions, SQL_CREATE_DB_CONFIG, \
-    SQL_SELECT_VERSIONS, SQL_INSERT_DEFAULT_VERSIONS
+from dbupgrade.db import \
+    fetch_current_db_versions, execute_stream, \
+    SQL_CREATE_DB_CONFIG, SQL_SELECT_VERSIONS, SQL_INSERT_DEFAULT_VERSIONS, \
+    SQL_UPDATE_VERSIONS
 
 
 class FetchCurrentDBVersionsTest(TestCase):
@@ -35,7 +38,8 @@ class FetchCurrentDBVersionsTest(TestCase):
 
     def test_engine(self) -> None:
         fetch_current_db_versions("sqlite:///", "myschema")
-        self._create_engine.assert_called_once_with("sqlite:///")
+        self._create_engine.assert_called_once_with(
+            "sqlite:///", convert_unicode=True)
         self._create_engine.return_value.dispose.assert_called_once()
 
     def test_dispose_engine_on_error(self) -> None:
@@ -132,3 +136,49 @@ class FetchCurrentDBVersionsTest(TestCase):
         fetch_current_db_versions("mysql:///", "myschema")
         expected_query = SQL_CREATE_DB_CONFIG.format(quote="`")
         self._assert_execute_any_call(expected_query)
+
+
+class ExecuteStreamTest(TestCase):
+
+    def setUp(self) -> None:
+        self._create_engine_patch = patch("dbupgrade.db.create_engine")
+        self._create_engine = self._create_engine_patch.start()
+        self._create_engine.return_value.dialect.name = "sqlite"
+        self._execute = self._create_engine.return_value.begin.return_value. \
+            __enter__.return_value.execute
+
+    def tearDown(self) -> None:
+        self._create_engine.stop()
+
+    def _assert_execute_has_calls(self, expected_queries: Sequence[Any]) \
+            -> None:
+        assert_equal(len(expected_queries), len(self._execute.call_args_list))
+        for c, ca in zip(expected_queries, self._execute.call_args_list):
+            cac = call(str(ca[0][0]), **ca[1])
+            assert_equal(c, cac)
+
+    def test_engine(self) -> None:
+        sql = "SELECT * FROM foo"
+        execute_stream("sqlite:///", StringIO(sql), "myschema", 0, 0)
+        self._create_engine.assert_called_once_with(
+            "sqlite:///", convert_unicode=True)
+        self._create_engine.return_value.dispose.assert_called_once()
+
+    def test_dispose_engine_on_error(self) -> None:
+        self._execute.side_effect = ValueError()
+        with assert_raises(ValueError):
+            sql = "SELECT * FROM foo"
+            execute_stream("sqlite:///", StringIO(sql),
+                           "myschema", 44, 13)
+        self._create_engine.return_value.dispose.assert_called_once()
+
+    def test_execute(self) -> None:
+        sql = "SELECT * FROM foo; SELECT * FROM bar;"
+        execute_stream("sqlite:///", StringIO(sql),
+                       "myschema", 44, 13)
+        update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
+        self._assert_execute_has_calls([
+            call("SELECT * FROM foo"),
+            call("SELECT * FROM bar"),
+            call(update_sql, schema="myschema", version=44, api_level=13),
+        ])
