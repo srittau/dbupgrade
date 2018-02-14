@@ -5,8 +5,9 @@ from typing import List
 
 class FileInfo:
 
-    def __init__(self, schema: str, dialect: str, version: int,
+    def __init__(self, filename: str, schema: str, dialect: str, version: int,
                  api_level: int) -> None:
+        self.filename = filename
         self.schema = schema
         self.dialect = dialect
         self.version = version
@@ -18,8 +19,8 @@ class FileInfo:
         return self.version < other.version
 
     def __repr__(self) -> str:
-        return f"FileInfo({repr(self.schema)}, {repr(self.dialect)}, " \
-               f"{self.version}, {self.api_level})"
+        return f"FileInfo({repr(self.filename)}, {repr(self.schema)}, " \
+               f"{repr(self.dialect)}, {self.version}, {self.api_level})"
 
 
 def collect_sql_files(directory: str) -> List[str]:

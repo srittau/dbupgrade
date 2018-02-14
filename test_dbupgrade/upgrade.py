@@ -39,7 +39,7 @@ class DBUpgradeTest(TestCase):
 
     def test_exercise(self) -> None:
         filenames = ["/tmp/foo", "/tmp/bar"]
-        file_infos = [FileInfo("myschema", "postgres", 150, 30)]
+        file_infos = [FileInfo("", "myschema", "postgres", 150, 30)]
         args = self._create_arguments(
             schema="myschema", db_url="postgres://localhost/foo",
             script_path="/tmp")
@@ -57,10 +57,10 @@ class DBUpgradeTest(TestCase):
     def test_filter(self) -> None:
         args = self._create_arguments()
         self._fetch_current_db_versions.return_value = 130, 34
-        file_info = FileInfo("myschema", "", 0, 0)
+        file_info = FileInfo("", "myschema", "", 0, 0)
         self._parse_sql_files.return_value = [
             file_info,
-            FileInfo("otherschema", "", 0, 0),
+            FileInfo("", "otherschema", "", 0, 0),
         ]
         with patch("dbupgrade.upgrade.filter_from_arguments") as ffa:
             ffa.return_value.matches = lambda fi: fi.schema == "myschema"
@@ -70,9 +70,9 @@ class DBUpgradeTest(TestCase):
 
     def test_order(self) -> None:
         args = self._create_arguments()
-        fi123 = FileInfo("myschema", "postgres", 123, 0)
-        fi122 = FileInfo("myschema", "postgres", 122, 0)
-        fi124 = FileInfo("myschema", "postgres", 124, 0)
+        fi123 = FileInfo("", "myschema", "postgres", 123, 0)
+        fi122 = FileInfo("", "myschema", "postgres", 122, 0)
+        fi124 = FileInfo("", "myschema", "postgres", 124, 0)
         self._parse_sql_files.return_value = [fi123, fi122, fi124]
         with patch("dbupgrade.upgrade.filter_from_arguments") as ffa:
             ffa.return_value.matches.return_value = True

@@ -23,10 +23,10 @@ def parse_sql_files(files: Sequence[str]) -> List[FileInfo]:
 
 def _parse_sql_file(filename: str) -> FileInfo:
     with open(filename, "r") as stream:
-        return parse_sql_stream(stream)
+        return parse_sql_stream(stream, filename)
 
 
-def parse_sql_stream(stream: IO[str]) -> FileInfo:
+def parse_sql_stream(stream: IO[str], filename: str) -> FileInfo:
     headers = parse_sql_headers(stream)
     try:
         schema = headers["schema"]
@@ -46,7 +46,7 @@ def parse_sql_stream(stream: IO[str]) -> FileInfo:
     version = to_int(version_str, "version")
     api_level = to_int(api_level_str, "api-level")
 
-    return FileInfo(schema, dialect, version, api_level)
+    return FileInfo(filename, schema, dialect, version, api_level)
 
 
 _line_re = re.compile(r"^--\s+((?:[a-zA-Z][a-zA-Z0-9]*)"

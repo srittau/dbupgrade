@@ -2,7 +2,7 @@ import os.path
 from io import StringIO
 from typing import TextIO
 from unittest import TestCase
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, call, ANY
 
 from asserts import assert_equal, assert_raises_regex
 
@@ -13,7 +13,7 @@ from dbupgrade.sql import parse_sql_files, ParseError, parse_sql_stream
 class ParseSQLFilesTest(TestCase):
 
     def _create_file_info(self) -> FileInfo:
-        return FileInfo("myschema", "sqlite", 0, 0)
+        return FileInfo("", "myschema", "sqlite", 0, 0)
 
     def test_no_files(self) -> None:
         files = parse_sql_files([])
@@ -22,7 +22,7 @@ class ParseSQLFilesTest(TestCase):
     def test_parse(self) -> None:
         file_info = self._create_file_info()
 
-        def my_parse_stream(stream: TextIO) -> FileInfo:
+        def my_parse_stream(stream: TextIO, _: str) -> FileInfo:
             assert_equal("file content", stream.read())
             return file_info
 
@@ -30,7 +30,8 @@ class ParseSQLFilesTest(TestCase):
             with patch("dbupgrade.sql.parse_sql_stream") as parse_stream:
                 parse_stream.side_effect = my_parse_stream
                 files = parse_sql_files(["foo", "bar"])
-                assert_equal(2, len(parse_stream.call_args_list))
+                parse_stream.assert_has_calls(
+                    [call(ANY, "foo"), call(ANY, "bar")])
         assert_equal([file_info, file_info], files)
 
     def test_skip_files_with_parse_errors(self) -> None:
@@ -55,7 +56,8 @@ class ParseSQLStreamTest(TestCase):
 -- API-Level: 3
 
 UPDATE foo SET bar = 99;
-        """))
+        """), "/foo/bar")
+        assert_equal("/foo/bar", info.filename)
         assert_equal("my-schema", info.schema)
         assert_equal("sqlite", info.dialect)
         assert_equal(13, info.version)
@@ -66,21 +68,21 @@ UPDATE foo SET bar = 99;
             parse_sql_stream(StringIO("""-- Dialect: sqlite
 -- Version: 13
 -- API-Level: 3
-            """))
+            """), "")
 
     def test_dialect_missing(self) -> None:
         with assert_raises_regex(ParseError, "missing header: dialect"):
             parse_sql_stream(StringIO("""-- Schema: my-schema
 -- Version: 13
 -- API-Level: 3
-            """))
+            """), "")
 
     def test_version_missing(self) -> None:
         with assert_raises_regex(ParseError, "missing header: version"):
             parse_sql_stream(StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- API-Level: 3
-            """))
+            """), "")
 
     def test_version_is_not_an_int(self) -> None:
         with assert_raises_regex(
@@ -89,7 +91,7 @@ UPDATE foo SET bar = 99;
 -- Dialect: sqlite
 -- Version: INVALID
 -- API-Level: 3
-            """))
+            """), "")
 
     def test_api_level_is_not_an_int(self) -> None:
         with assert_raises_regex(
@@ -98,14 +100,14 @@ UPDATE foo SET bar = 99;
 -- Dialect: sqlite
 -- Version: 24
 -- API-Level: INVALID
-            """))
+            """), "")
 
     def test_api_level_missing(self) -> None:
         with assert_raises_regex(ParseError, "missing header: api-level"):
             parse_sql_stream(StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- Version: 3
-            """))
+            """), "")
 
     def test_ignore_headers_after_break(self) -> None:
         with assert_raises_regex(ParseError, "missing header: api-level"):
@@ -114,4 +116,4 @@ UPDATE foo SET bar = 99;
 -- Version: 13
 
 -- API-Level: 3
-        """))
+        """), "")
