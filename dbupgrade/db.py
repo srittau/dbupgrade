@@ -46,7 +46,7 @@ class _EngineContext:
 
     def __init__(self, db_url: str) -> None:
         self._db_url = db_url
-        self._engine: Optional[Engine] = None
+        self._engine = None  # type: Optional[Engine]
 
     def __enter__(self) -> Engine:
         self._engine = create_engine(self._db_url, convert_unicode=True)
@@ -93,7 +93,7 @@ def _try_fetching_version_info_for_schema(engine: Engine, schema: str) \
     sql = SQL_SELECT_VERSIONS.format(quote=_quote_char(engine))
     query = sa_text(sql)
     result = engine.execute(query, col=schema)
-    rows: List[Tuple[int, int]] = result.fetchall()
+    rows = result.fetchall()  # type: List[Tuple[int, int]]
     return rows[0] if len(rows) == 1 else None
 
 

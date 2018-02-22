@@ -20,8 +20,9 @@ class FileInfo:
         return self.version < other.version
 
     def __repr__(self) -> str:
-        return f"FileInfo({repr(self.filename)}, {repr(self.schema)}, " \
-               f"{repr(self.dialect)}, {self.version}, {self.api_level})"
+        return "FileInfo({}, {}, {}, {}, {})".format(
+            repr(self.filename), repr(self.schema), repr(self.dialect),
+            self.version, self.api_level)
 
 
 def collect_sql_files(directory: str) -> List[str]:

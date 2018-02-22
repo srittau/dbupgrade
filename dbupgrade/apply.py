@@ -12,7 +12,7 @@ def apply_files(db_url: str, files: Sequence[FileInfo]) -> None:
 
 def apply_file(db_url: str, file_info: FileInfo) -> None:
     logging.info(
-        f"applying #{file_info.version} (API level {file_info.api_level})")
+        "applying #{0.version} (API level {0.api_level})".format(file_info))
     with open(file_info.filename, "r") as stream:
         execute_stream(db_url, stream, file_info.schema,
                        file_info.version, file_info.api_level,

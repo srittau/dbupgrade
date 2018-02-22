@@ -41,13 +41,13 @@ class FetchCurrentDBVersionsTest(TestCase):
         fetch_current_db_versions("sqlite:///", "myschema")
         self._create_engine.assert_called_once_with(
             "sqlite:///", convert_unicode=True)
-        self._create_engine.return_value.dispose.assert_called_once()
+        self._create_engine.return_value.dispose.assert_called_once_with()
 
     def test_dispose_engine_on_error(self) -> None:
         self._execute.side_effect = ValueError()
         with assert_raises(ValueError):
             fetch_current_db_versions("sqlite:///", "myschema")
-        self._create_engine.return_value.dispose.assert_called_once()
+        self._create_engine.return_value.dispose.assert_called_once_with()
 
     def test_table_does_not_exist(self) -> None:
         create_sql = SQL_CREATE_DB_CONFIG.format(quote='"')
@@ -65,7 +65,7 @@ class FetchCurrentDBVersionsTest(TestCase):
             elif real_sql == insert_versions:
                 return Mock()
             else:
-                raise AssertionError(f"unexpected SQL '{sql}'")
+                raise AssertionError("unexpected SQL '{}'".format(sql))
 
         self._execute.side_effect = execute
         version, api_level = \
@@ -94,7 +94,7 @@ class FetchCurrentDBVersionsTest(TestCase):
             elif real_sql == insert_versions:
                 return Mock()
             else:
-                raise AssertionError(f"unexpected SQL '{sql}'")
+                raise AssertionError("unexpected SQL '{}'".format(sql))
 
         self._execute.side_effect = execute
         version, api_level = \
@@ -120,7 +120,7 @@ class FetchCurrentDBVersionsTest(TestCase):
                 m.fetchall.return_value = [(123, 34)]
                 return m
             else:
-                raise AssertionError(f"unexpected SQL '{sql}'")
+                raise AssertionError("unexpected SQL '{}'".format(sql))
 
         self._execute.side_effect = execute
         version, api_level = \
@@ -164,7 +164,7 @@ class ExecuteStreamTest(TestCase):
         execute_stream("sqlite:///", StringIO(sql), "myschema", 0, 0)
         self._create_engine.assert_called_once_with(
             "sqlite:///", convert_unicode=True)
-        self._create_engine.return_value.dispose.assert_called_once()
+        self._create_engine.return_value.dispose.assert_called_once_with()
 
     def test_dispose_engine_on_error(self) -> None:
         self._execute.side_effect = ValueError()
@@ -172,7 +172,7 @@ class ExecuteStreamTest(TestCase):
             sql = "SELECT * FROM foo"
             execute_stream("sqlite:///", StringIO(sql),
                            "myschema", 44, 13)
-        self._create_engine.return_value.dispose.assert_called_once()
+        self._create_engine.return_value.dispose.assert_called_once_with()
 
     def test_execute_with_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"

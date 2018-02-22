@@ -17,7 +17,9 @@ def db_upgrade(args: Arguments) -> None:
 
 def create_filter(args: Arguments) -> Filter:
     version, api_level = fetch_current_db_versions(args.db_url, args.schema)
-    logging.info(f"current version: {version}, current API level: {api_level}")
+    logging.info(
+        "current version: {version}, current API level: {api_level}".format(
+            version=version, api_level=api_level))
     return filter_from_arguments(args, version + 1, api_level)
 
 

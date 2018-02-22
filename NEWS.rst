@@ -1,3 +1,8 @@
+News in dbupgrade 0.2.1
+=======================
+
+* Python 3.5 compatibility.
+
 News in dbupgrade 0.2.0
 =======================
 

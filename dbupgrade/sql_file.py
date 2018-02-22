@@ -34,7 +34,7 @@ def parse_sql_stream(stream: IO[str], filename: str) -> FileInfo:
         version = _int_header(headers, "version")
         api_level = _int_header(headers, "api-level")
     except KeyError as exc:
-        raise ParseError(f"missing header: {exc.args[0]}") from None
+        raise ParseError("missing header: {0.args[0]}".format(exc)) from None
 
     info = FileInfo(filename, schema, dialect, version, api_level)
     if "transaction" in headers:
@@ -66,7 +66,7 @@ def _bool_header(headers: Dict[str, str], header_name: str) -> bool:
         return _BOOL_VALUES[headers[header_name]]
     except KeyError:
         raise ParseError(
-            f"header must be 'yes' or 'no': {header_name}") from None
+            "header must be 'yes' or 'no': " + header_name) from None
 
 
 def _int_header(headers: Dict[str, str], header_name: str) -> int:
@@ -74,4 +74,4 @@ def _int_header(headers: Dict[str, str], header_name: str) -> int:
         return int(headers[header_name])
     except ValueError:
         raise ParseError(
-            f"header is not an integer: {header_name}") from None
+            "header is not an integer: " + header_name) from None
