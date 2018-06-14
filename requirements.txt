@@ -1,4 +1,4 @@
-asserts==0.8.1
-mypy==0.560
-sqlalchemy==1.2.2
-wheel==0.30.0
+asserts==0.8.3
+mypy==0.610
+sqlalchemy==1.2.8
+wheel==0.31.1
