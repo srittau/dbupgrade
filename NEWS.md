@@ -7,6 +7,11 @@ Improvements
 * Relax type requirements for the `stream` arguments of
   `parse_sql_stream()`, `split_sql()`, and `execute_stream()`.
 
+Bug Fixes
+---------
+
+* Fix escaping of percent signs.
+
 News in dbupgrade 0.2.1
 =======================
 

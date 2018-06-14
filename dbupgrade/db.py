@@ -57,6 +57,10 @@ class _EngineContext:
         self._engine = None
 
 
+def _should_escape_percents(connection: Connection) -> str:
+    return connection.engine.dialect.paramstyle in ["format", "pyformat"]
+
+
 def fetch_current_db_versions(db_url: str, schema: str) -> Tuple[int, int]:
     """Return the current version and API level of the database for the
     given schema.
@@ -125,7 +129,11 @@ def _execute_stream_in_conn(conn: Connection, stream: Iterable[str], schema: str
 def _execute_sql_stream(conn: Connection, stream: Iterable[str]) -> None:
     """Run the SQL statements in a stream against a database."""
     for query in split_sql(stream):
-        conn.execute(query)
+        if _should_escape_percents(conn):
+            escaped_query = query.replace("%", "%%")
+        else:
+            escaped_query = query
+        conn.execute(escaped_query)
 
 
 def _update_versions(conn: Connection, schema: str, version: int,

@@ -1,6 +1,6 @@
 from io import StringIO
 from typing import Any, Sequence
-from unittest.mock import call, Mock
+from unittest.mock import call, Mock, MagicMock
 
 from asserts import \
     assert_true, assert_equal, assert_raises, assert_is_instance
@@ -19,9 +19,11 @@ from dbupgrade.db import \
 class FetchCurrentDBVersionsTest(TestCase):
     @before
     def setup_patches(self) -> None:
+        engine = MagicMock()
+        engine.dialect.name = "sqlite"
         self._create_engine = self.patch("dbupgrade.db.create_engine")
-        self._create_engine.return_value.dialect.name = "sqlite"
-        self._execute = self._create_engine.return_value.execute
+        self._create_engine.return_value = engine
+        self._execute = engine.execute
 
     def _assert_execute_any_call(self, expected_query: str) -> None:
         assert_true(
@@ -37,7 +39,7 @@ class FetchCurrentDBVersionsTest(TestCase):
             assert_equal(c, cac)
 
     @test
-    def engine(self) -> None:
+    def create_engine_called(self) -> None:
         fetch_current_db_versions("sqlite:///", "myschema")
         self._create_engine.assert_called_once_with(
             "sqlite:///", convert_unicode=True)
@@ -147,11 +149,17 @@ class FetchCurrentDBVersionsTest(TestCase):
 class ExecuteStreamTest(TestCase):
     @before
     def setup_patches(self) -> None:
+        self.engine = MagicMock()
+        self.engine.dialect.name = "sqlite"
         self._create_engine = self.patch("dbupgrade.db.create_engine")
-        self._create_engine.return_value.dialect.name = "sqlite"
-        self._conn = self._create_engine.return_value.begin. \
-            return_value.__enter__.return_value
-        self._execute = self._conn.execute
+        self._create_engine.return_value = self.engine
+        self._set_paramstyle("pyformat")
+        self.connection = self.engine.begin.return_value.__enter__.return_value
+        self.connection.engine = self.engine
+        self._execute = self.connection.execute
+
+    def _set_paramstyle(self, paramstyle: str) -> None:
+        self.engine.dialect.paramstyle = paramstyle
 
     def _assert_execute_has_calls(self, execute_mock: Mock,
                                   expected_queries: Sequence[Any]) -> None:
@@ -161,7 +169,7 @@ class ExecuteStreamTest(TestCase):
             assert_equal(c, cac)
 
     @test
-    def engine(self) -> None:
+    def create_engine_called(self) -> None:
         sql = "SELECT * FROM foo"
         execute_stream("sqlite:///", StringIO(sql), "myschema", 0, 0)
         self._create_engine.assert_called_once_with(
@@ -181,7 +189,7 @@ class ExecuteStreamTest(TestCase):
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         execute_stream(
             "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=True)
-        self._conn.execution_options.assert_not_called()
+        self.connection.execution_options.assert_not_called()
         update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
         self._assert_execute_has_calls(self._execute, [
             call("SELECT * FROM foo"),
@@ -195,5 +203,27 @@ class ExecuteStreamTest(TestCase):
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         execute_stream(
             "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=False)
-        self._conn.execution_options.assert_called_with(
+        self.connection.execution_options.assert_called_with(
             isolation_level="AUTOCOMMIT")
+
+    @test
+    def escape_percent_signs__paramstyle_pyformat(self) -> None:
+        self._set_paramstyle("pyformat")
+        sql = "SELECT 1 % 2"
+        execute_stream("sqlite:///", StringIO(sql), "myschema", 44, 13)
+        update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
+        self._assert_execute_has_calls(self._execute, [
+            call("SELECT 1 %% 2"),
+            call(update_sql, schema="myschema", version=44, api_level=13),
+        ])
+
+    @test
+    def escape_percent_signs__paramstyle_qmark(self) -> None:
+        self._set_paramstyle("qmark")
+        sql = "SELECT 1 % 2"
+        execute_stream("sqlite:///", StringIO(sql), "myschema", 44, 13)
+        update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
+        self._assert_execute_has_calls(self._execute, [
+            call("SELECT 1 % 2"),
+            call(update_sql, schema="myschema", version=44, api_level=13),
+        ])
