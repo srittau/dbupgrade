@@ -1,4 +1,4 @@
-from typing import Tuple, Any, Optional, List, Union, Iterable
+from typing import Tuple, Any, Optional, List, Iterable
 
 from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Engine, Connection
@@ -57,7 +57,7 @@ class _EngineContext:
         self._engine = None
 
 
-def _should_escape_percents(connection: Connection) -> str:
+def _should_escape_percents(connection: Connection) -> bool:
     return connection.engine.dialect.paramstyle in ["format", "pyformat"]
 
 
