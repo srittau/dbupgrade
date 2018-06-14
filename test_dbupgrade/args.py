@@ -1,27 +1,22 @@
-import sys
+from contextlib import redirect_stderr, redirect_stdout
 
 from io import StringIO
-from typing import cast
 
 from asserts import assert_false, assert_true, assert_equal, assert_raises
 
-from dectest import TestCase, test, before
+from dectest import TestCase, test
 
 from dbupgrade.args import parse_args
 
 
 class ParseArgsTest(TestCase):
-    @before
-    def setup_streams(self) -> None:
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
-
     @test
     def help(self) -> None:
+        out = StringIO()
         with assert_raises(SystemExit):
-            parse_args(["script", "--help"])
-        output = cast(StringIO, sys.stdout).getvalue()
-        assert_true(output.startswith("usage: script"))
+            with redirect_stdout(out):
+                parse_args(["script", "--help"])
+        assert_true(out.getvalue().startswith("usage: script"))
 
     @test
     def no_options(self) -> None:
@@ -43,7 +38,8 @@ class ParseArgsTest(TestCase):
     @test
     def small_l_option__no_argument(self) -> None:
         with assert_raises(SystemExit):
-            parse_args(["script", "schema", "url", "dir", "-l"])
+            with redirect_stderr(StringIO()):
+                parse_args(["script", "schema", "url", "dir", "-l"])
 
     @test
     def big_l_option(self) -> None:
@@ -54,7 +50,9 @@ class ParseArgsTest(TestCase):
     @test
     def big_and_small_l_option(self) -> None:
         with assert_raises(SystemExit):
-            parse_args(["script", "-L", "-l", "25", "schema", "url", "dir"])
+            with redirect_stderr(StringIO()):
+                parse_args(
+                    ["script", "-L", "-l", "25", "schema", "url", "dir"])
 
     @test
     def small_m_option(self) -> None:
@@ -65,9 +63,11 @@ class ParseArgsTest(TestCase):
     @test
     def small_m_option__without_version(self) -> None:
         with assert_raises(SystemExit):
-            parse_args(["script", "-m", "schema", "url", "dir"])
+            with redirect_stderr(StringIO()):
+                parse_args(["script", "-m", "schema", "url", "dir"])
 
     @test
     def small_m_option__invalid_version(self) -> None:
         with assert_raises(SystemExit):
-            parse_args(["script", "-m", "INVALID", "schema", "url", "dir"])
+            with redirect_stderr(StringIO()):
+                parse_args(["script", "-m", "INVALID", "schema", "url", "dir"])
