@@ -1,32 +1,27 @@
 from io import StringIO
-from unittest import TestCase
-from unittest.mock import patch, mock_open
+
+from dectest import TestCase, test, before
 
 from dbupgrade.apply import apply_file
 from dbupgrade.files import FileInfo
 
 
 class ApplyFileTest(TestCase):
-    def setUp(self) -> None:
-        self._open_patch = patch("dbupgrade.apply.open")
-        self._open = self._open_patch.start()
-        self._logging_patch = patch("dbupgrade.apply.logging")
-        self._logging = self._logging_patch.start()
-        self._execute_patch = patch("dbupgrade.apply.execute_stream")
-        self._execute_stream = self._execute_patch.start()
+    @before
+    def setup_patches(self) -> None:
+        self._open = self.patch("dbupgrade.apply.open")
+        self._logging = self.patch("dbupgrade.apply.logging")
+        self._execute_stream = self.patch("dbupgrade.apply.execute_stream")
 
-    def tearDown(self) -> None:
-        self._open_patch.stop()
-        self._logging_patch.stop()
-        self._execute_patch.stop()
-
-    def test_log(self) -> None:
+    @test
+    def log(self) -> None:
         info = FileInfo("/foo/bar", "myschema", "sqlite", 45, 3)
         apply_file("sqlite:///", info)
         self._logging.info.assert_called_once_with(
             "applying #45 (API level 3)")
 
-    def test_execute__with_transaction(self) -> None:
+    @test
+    def execute__with_transaction(self) -> None:
         stream = StringIO("")
         self._open.return_value = stream
         info = FileInfo("/foo/bar", "myschema", "sqlite", 45, 3)
@@ -36,7 +31,8 @@ class ApplyFileTest(TestCase):
         self._execute_stream.assert_called_once_with(
             "sqlite:///", stream, "myschema", 45, 3, transaction=True)
 
-    def test_execute__without_transaction(self) -> None:
+    @test
+    def execute__without_transaction(self) -> None:
         stream = StringIO("")
         self._open.return_value = stream
         info = FileInfo("/foo/bar", "myschema", "sqlite", 45, 3)

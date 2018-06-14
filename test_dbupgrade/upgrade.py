@@ -1,5 +1,6 @@
-from unittest import TestCase
 from unittest.mock import patch, ANY
+
+from dectest import TestCase, test, before
 
 from dbupgrade.args import Arguments
 from dbupgrade.files import FileInfo
@@ -7,28 +8,18 @@ from dbupgrade.upgrade import db_upgrade
 
 
 class DBUpgradeTest(TestCase):
-    def setUp(self) -> None:
-        self._logging_patch = patch("dbupgrade.upgrade.logging")
-        self._logging = self._logging_patch.start()
-        self._fetch_patch = \
-            patch("dbupgrade.upgrade.fetch_current_db_versions")
-        self._fetch_current_db_versions = self._fetch_patch.start()
+    @before
+    def setup_patches(self) -> None:
+        self._logging = self.patch("dbupgrade.upgrade.logging")
+        self._fetch_current_db_versions = \
+            self.patch("dbupgrade.upgrade.fetch_current_db_versions")
         self._fetch_current_db_versions.return_value = 0, 0
-        self._collect_patch = patch("dbupgrade.upgrade.collect_sql_files")
-        self._collect_sql_files = self._collect_patch.start()
+        self._collect_sql_files = \
+            self.patch("dbupgrade.upgrade.collect_sql_files")
         self._collect_sql_files.return_value = []
-        self._parse_patch = patch("dbupgrade.upgrade.parse_sql_files")
-        self._parse_sql_files = self._parse_patch.start()
+        self._parse_sql_files = self.patch("dbupgrade.upgrade.parse_sql_files")
         self._parse_sql_files.return_value = []
-        self._apply_patch = patch("dbupgrade.upgrade.apply_files")
-        self._apply_files = self._apply_patch.start()
-
-    def tearDown(self) -> None:
-        self._logging_patch.stop()
-        self._fetch_patch.stop()
-        self._collect_patch.stop()
-        self._parse_patch.stop()
-        self._apply_patch.stop()
+        self._apply_files = self.patch("dbupgrade.upgrade.apply_files")
 
     def _create_arguments(self,
                           *,
@@ -38,7 +29,8 @@ class DBUpgradeTest(TestCase):
         return Arguments(
             schema, db_url, script_path, None, None, ignore_api_level=True)
 
-    def test_exercise(self) -> None:
+    @test
+    def exercise(self) -> None:
         filenames = ["/tmp/foo", "/tmp/bar"]
         file_infos = [FileInfo("", "myschema", "postgres", 150, 30)]
         args = self._create_arguments(
@@ -56,7 +48,8 @@ class DBUpgradeTest(TestCase):
         self._apply_files.assert_called_once_with("postgres://localhost/foo",
                                                   file_infos)
 
-    def test_filter(self) -> None:
+    @test
+    def filter(self) -> None:
         args = self._create_arguments()
         self._fetch_current_db_versions.return_value = 130, 34
         file_info = FileInfo("", "myschema", "", 0, 0)
@@ -70,7 +63,8 @@ class DBUpgradeTest(TestCase):
             ffa.assert_called_once_with(args, 131, 34)
             self._apply_files.assert_called_once_with(ANY, [file_info])
 
-    def test_order(self) -> None:
+    @test
+    def order(self) -> None:
         args = self._create_arguments()
         fi123 = FileInfo("", "myschema", "postgres", 123, 0)
         fi122 = FileInfo("", "myschema", "postgres", 122, 0)
@@ -82,7 +76,8 @@ class DBUpgradeTest(TestCase):
             self._apply_files.assert_called_once_with(ANY,
                                                       [fi122, fi123, fi124])
 
-    def test_log(self) -> None:
+    @test
+    def log(self) -> None:
         args = self._create_arguments()
         self._fetch_current_db_versions.return_value = 123, 44
         db_upgrade(args)

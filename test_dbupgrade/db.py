@@ -1,10 +1,11 @@
 from io import StringIO
 from typing import Any, Sequence
-from unittest import TestCase
-from unittest.mock import patch, call, Mock
+from unittest.mock import call, Mock
 
-from asserts import assert_true, assert_equal, assert_raises, \
-    assert_is_instance
+from asserts import \
+    assert_true, assert_equal, assert_raises, assert_is_instance
+
+from dectest import TestCase, test, before
 
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.elements import TextClause
@@ -16,14 +17,11 @@ from dbupgrade.db import \
 
 
 class FetchCurrentDBVersionsTest(TestCase):
-    def setUp(self) -> None:
-        self._create_engine_patch = patch("dbupgrade.db.create_engine")
-        self._create_engine = self._create_engine_patch.start()
+    @before
+    def setup_patches(self) -> None:
+        self._create_engine = self.patch("dbupgrade.db.create_engine")
         self._create_engine.return_value.dialect.name = "sqlite"
         self._execute = self._create_engine.return_value.execute
-
-    def tearDown(self) -> None:
-        self._create_engine.stop()
 
     def _assert_execute_any_call(self, expected_query: str) -> None:
         assert_true(
@@ -38,19 +36,22 @@ class FetchCurrentDBVersionsTest(TestCase):
             cac = call(str(ca[0][0]), **ca[1])
             assert_equal(c, cac)
 
-    def test_engine(self) -> None:
+    @test
+    def engine(self) -> None:
         fetch_current_db_versions("sqlite:///", "myschema")
         self._create_engine.assert_called_once_with(
             "sqlite:///", convert_unicode=True)
         self._create_engine.return_value.dispose.assert_called_once_with()
 
-    def test_dispose_engine_on_error(self) -> None:
+    @test
+    def dispose_engine_on_error(self) -> None:
         self._execute.side_effect = ValueError()
         with assert_raises(ValueError):
             fetch_current_db_versions("sqlite:///", "myschema")
         self._create_engine.return_value.dispose.assert_called_once_with()
 
-    def test_table_does_not_exist(self) -> None:
+    @test
+    def table_does_not_exist(self) -> None:
         create_sql = SQL_CREATE_DB_CONFIG.format(quote='"')
         select_versions = SQL_SELECT_VERSIONS.format(quote='"')
         insert_versions = SQL_INSERT_DEFAULT_VERSIONS.format(quote='"')
@@ -79,7 +80,8 @@ class FetchCurrentDBVersionsTest(TestCase):
             call(insert_versions, schema="myschema"),
         ])
 
-    def test_table_has_no_row_for_schema(self) -> None:
+    @test
+    def table_has_no_row_for_schema(self) -> None:
         create_sql = SQL_CREATE_DB_CONFIG.format(quote='"')
         select_versions = SQL_SELECT_VERSIONS.format(quote='"')
         insert_versions = SQL_INSERT_DEFAULT_VERSIONS.format(quote='"')
@@ -108,7 +110,8 @@ class FetchCurrentDBVersionsTest(TestCase):
             call(insert_versions, schema="myschema"),
         ])
 
-    def test_table_has_row(self) -> None:
+    @test
+    def table_has_row(self) -> None:
         create_sql = SQL_CREATE_DB_CONFIG.format(quote='"')
         select_versions = SQL_SELECT_VERSIONS.format(quote='"')
 
@@ -133,7 +136,8 @@ class FetchCurrentDBVersionsTest(TestCase):
             call(select_versions, col="myschema"),
         ])
 
-    def test_mysql_quote_char(self) -> None:
+    @test
+    def mysql_quote_char(self) -> None:
         self._create_engine.return_value.dialect.name = "mysql+foo"
         fetch_current_db_versions("mysql:///", "myschema")
         expected_query = SQL_CREATE_DB_CONFIG.format(quote="`")
@@ -141,16 +145,13 @@ class FetchCurrentDBVersionsTest(TestCase):
 
 
 class ExecuteStreamTest(TestCase):
-    def setUp(self) -> None:
-        self._create_engine_patch = patch("dbupgrade.db.create_engine")
-        self._create_engine = self._create_engine_patch.start()
+    @before
+    def setup_patches(self) -> None:
+        self._create_engine = self.patch("dbupgrade.db.create_engine")
         self._create_engine.return_value.dialect.name = "sqlite"
         self._conn = self._create_engine.return_value.begin. \
             return_value.__enter__.return_value
         self._execute = self._conn.execute
-
-    def tearDown(self) -> None:
-        self._create_engine.stop()
 
     def _assert_execute_has_calls(self, execute_mock: Mock,
                                   expected_queries: Sequence[Any]) -> None:
@@ -159,21 +160,24 @@ class ExecuteStreamTest(TestCase):
             cac = call(str(ca[0][0]), **ca[1])
             assert_equal(c, cac)
 
-    def test_engine(self) -> None:
+    @test
+    def engine(self) -> None:
         sql = "SELECT * FROM foo"
         execute_stream("sqlite:///", StringIO(sql), "myschema", 0, 0)
         self._create_engine.assert_called_once_with(
             "sqlite:///", convert_unicode=True)
         self._create_engine.return_value.dispose.assert_called_once_with()
 
-    def test_dispose_engine_on_error(self) -> None:
+    @test
+    def dispose_engine_on_error(self) -> None:
         self._execute.side_effect = ValueError()
         with assert_raises(ValueError):
             sql = "SELECT * FROM foo"
             execute_stream("sqlite:///", StringIO(sql), "myschema", 44, 13)
         self._create_engine.return_value.dispose.assert_called_once_with()
 
-    def test_execute_with_transaction(self) -> None:
+    @test
+    def execute_with_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         execute_stream(
             "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=True)
@@ -186,7 +190,8 @@ class ExecuteStreamTest(TestCase):
         ])
         assert_is_instance(self._execute.call_args_list[2][0][0], TextClause)
 
-    def test_execute_without_transaction(self) -> None:
+    @test
+    def execute_without_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         execute_stream(
             "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=False)

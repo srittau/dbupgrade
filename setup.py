@@ -20,7 +20,10 @@ setup(
     packages=["dbupgrade"],
     scripts=[os.path.join("bin", "dbupgrade")],
     install_requires=["sqlalchemy >= 1.0"],
-    tests_require=["asserts >= 0.8.1, < 0.9"],
+    tests_require=[
+        "asserts >= 0.8.1, < 0.9",
+        "dectest >= 0.1.2, < 0.2",
+    ],
     license="MIT",
     classifiers=[
         "Development Status :: 4 - Beta",
