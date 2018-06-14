@@ -1,6 +1,12 @@
 News in dbupgrade 0.2.2
 =======================
 
+Improvements
+------------
+
+* Relax type requirements for the `stream` arguments of
+  `parse_sql_stream()`, `split_sql()`, and `execute_stream()`.
+
 News in dbupgrade 0.2.1
 =======================
 

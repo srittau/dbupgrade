@@ -1,13 +1,12 @@
 import logging
 import os.path
 import re
-from typing import Sequence, List, Dict, IO
+from typing import Sequence, List, Dict, Iterable
 
 from dbupgrade.files import FileInfo
 
 
 class ParseError(Exception):
-
     pass
 
 
@@ -26,7 +25,7 @@ def _parse_sql_file(filename: str) -> FileInfo:
         return parse_sql_stream(stream, filename)
 
 
-def parse_sql_stream(stream: IO[str], filename: str) -> FileInfo:
+def parse_sql_stream(stream: Iterable[str], filename: str) -> FileInfo:
     headers = _parse_sql_headers(stream)
     try:
         schema = headers["schema"]
@@ -46,7 +45,7 @@ _line_re = re.compile(r"^--\s+((?:[a-zA-Z][a-zA-Z0-9]*)"
                       r"(?:-[a-zA-Z][a-zA-Z0-9]*)*):\s+(.*)$")
 
 
-def _parse_sql_headers(stream: IO[str]) -> Dict[str, str]:
+def _parse_sql_headers(stream: Iterable[str]) -> Dict[str, str]:
     matches = []
     for line in stream:
         m = _line_re.match(line)

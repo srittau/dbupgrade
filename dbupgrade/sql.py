@@ -1,8 +1,8 @@
 import re
-from typing import Iterable, Generator, IO
+from typing import Iterable, Generator
 
 
-def split_sql(stream: IO[str]) -> Iterable[str]:
+def split_sql(stream: Iterable[str]) -> Iterable[str]:
     """Return an iterator over the SQL statements in a stream.
 
     >>> list(split_sql("SELECT * FROM foo; DELETE FROM foo;"))
@@ -21,7 +21,7 @@ _DELIMITER_LINE_RE = re.compile(r"^\s*delimiter\s+(.*)\s*$", re.IGNORECASE)
 
 
 class _SQLSplitter:
-    def __init__(self, stream: IO[str]) -> None:
+    def __init__(self, stream: Iterable[str]) -> None:
         self._stream = stream
         self._current_stmt = ""
         self._in_string = False

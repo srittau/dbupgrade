@@ -1,4 +1,4 @@
-from typing import Tuple, Any, Optional, List, IO, Union
+from typing import Tuple, Any, Optional, List, Union, Iterable
 
 from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Engine, Connection
@@ -103,7 +103,7 @@ def _insert_default_version_info(engine: Engine, schema: str) -> None:
 
 
 def execute_stream(db_url: str,
-                   stream: IO[str],
+                   stream: Iterable[str],
                    schema: str,
                    version: int,
                    api_level: int,
@@ -116,13 +116,13 @@ def execute_stream(db_url: str,
             _execute_stream_in_conn(conn, stream, schema, version, api_level)
 
 
-def _execute_stream_in_conn(conn: Connection, stream: IO[str], schema: str,
+def _execute_stream_in_conn(conn: Connection, stream: Iterable[str], schema: str,
                             version: int, api_level: int) -> None:
     _execute_sql_stream(conn, stream)
     _update_versions(conn, schema, version, api_level)
 
 
-def _execute_sql_stream(conn: Connection, stream: IO[str]) -> None:
+def _execute_sql_stream(conn: Connection, stream: Iterable[str]) -> None:
     """Run the SQL statements in a stream against a database."""
     for query in split_sql(stream):
         conn.execute(query)
