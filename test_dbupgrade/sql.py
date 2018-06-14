@@ -7,7 +7,6 @@ from dbupgrade.sql import split_sql
 
 
 class SplitSQLTest(TestCase):
-
     def _call_string(self, s: str) -> List[str]:
         return list(split_sql(StringIO(s)))
 

@@ -11,7 +11,6 @@ from dbupgrade.filter import Filter, filter_from_arguments, MAX_VERSION, \
 
 
 class FilterTest(TestCase):
-
     def test_init(self) -> None:
         filter_ = Filter("myschema", "postgres", 5, 10, 3)
         assert_equal("myschema", filter_.schema)
@@ -75,15 +74,19 @@ class FilterTest(TestCase):
 
 
 class FilterFromArgumentsTest(TestCase):
-
-    def _create_arguments(
-            self, *, schema: str = "testschema",
-            db_url: str = "postgres://localhost/foo",
-            max_api_level: Optional[int] = None,
-            max_version: Optional[int] = None,
-            ignore_api_level: bool = False) -> Arguments:
+    def _create_arguments(self,
+                          *,
+                          schema: str = "testschema",
+                          db_url: str = "postgres://localhost/foo",
+                          max_api_level: Optional[int] = None,
+                          max_version: Optional[int] = None,
+                          ignore_api_level: bool = False) -> Arguments:
         return Arguments(
-            schema, db_url, "/tmp", max_api_level, max_version,
+            schema,
+            db_url,
+            "/tmp",
+            max_api_level,
+            max_version,
             ignore_api_level=ignore_api_level)
 
     def test_schema(self) -> None:

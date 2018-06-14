@@ -21,7 +21,6 @@ _DELIMITER_LINE_RE = re.compile(r"^\s*delimiter\s+(.*)\s*$", re.IGNORECASE)
 
 
 class _SQLSplitter:
-
     def __init__(self, stream: IO[str]) -> None:
         self._stream = stream
         self._current_stmt = ""

@@ -12,7 +12,6 @@ from dbupgrade.sql_file import parse_sql_files, ParseError, parse_sql_stream
 
 
 class ParseSQLFilesTest(TestCase):
-
     def _create_file_info(self) -> FileInfo:
         return FileInfo("", "myschema", "sqlite", 0, 0)
 
@@ -27,8 +26,9 @@ class ParseSQLFilesTest(TestCase):
             assert_equal("file content", stream.read())
             return file_info
 
-        with patch("dbupgrade.sql_file.open",
-                   mock_open(read_data="file content")):
+        with patch(
+                "dbupgrade.sql_file.open",
+                mock_open(read_data="file content")):
             with patch("dbupgrade.sql_file.parse_sql_stream") as parse_stream:
                 parse_stream.side_effect = my_parse_stream
                 files = parse_sql_files(["foo", "bar"])
@@ -38,8 +38,9 @@ class ParseSQLFilesTest(TestCase):
 
     def test_skip_files_with_parse_errors(self) -> None:
         file_info = self._create_file_info()
-        with patch("dbupgrade.sql_file.open",
-                   mock_open(read_data="file content")):
+        with patch(
+                "dbupgrade.sql_file.open",
+                mock_open(read_data="file content")):
             with patch("dbupgrade.sql_file.logging") as logging:
                 with patch(
                         "dbupgrade.sql_file.parse_sql_stream") as parse_stream:
@@ -52,9 +53,9 @@ class ParseSQLFilesTest(TestCase):
 
 
 class ParseSQLStreamTest(TestCase):
-
     def test_required_headers(self) -> None:
-        info = parse_sql_stream(StringIO("""-- Schema: my-schema
+        info = parse_sql_stream(
+            StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- Version: 13
 -- API-Level: 3
@@ -69,7 +70,8 @@ UPDATE foo SET bar = 99;
         assert_true(info.transaction)
 
     def test_transaction_yes(self) -> None:
-        info = parse_sql_stream(StringIO("""-- Schema: my-schema
+        info = parse_sql_stream(
+            StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- Version: 25
 -- API-Level: 3
@@ -78,7 +80,8 @@ UPDATE foo SET bar = 99;
         assert_true(info.transaction)
 
     def test_transaction_no(self) -> None:
-        info = parse_sql_stream(StringIO("""-- Schema: my-schema
+        info = parse_sql_stream(
+            StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- Version: 25
 -- API-Level: 3
@@ -88,29 +91,33 @@ UPDATE foo SET bar = 99;
 
     def test_schema_missing(self) -> None:
         with assert_raises_regex(ParseError, "missing header: schema"):
-            parse_sql_stream(StringIO("""-- Dialect: sqlite
+            parse_sql_stream(
+                StringIO("""-- Dialect: sqlite
 -- Version: 13
 -- API-Level: 3
             """), "")
 
     def test_dialect_missing(self) -> None:
         with assert_raises_regex(ParseError, "missing header: dialect"):
-            parse_sql_stream(StringIO("""-- Schema: my-schema
+            parse_sql_stream(
+                StringIO("""-- Schema: my-schema
 -- Version: 13
 -- API-Level: 3
             """), "")
 
     def test_version_missing(self) -> None:
         with assert_raises_regex(ParseError, "missing header: version"):
-            parse_sql_stream(StringIO("""-- Schema: my-schema
+            parse_sql_stream(
+                StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- API-Level: 3
             """), "")
 
     def test_version_is_not_an_int(self) -> None:
-        with assert_raises_regex(
-                ParseError, "header is not an integer: version"):
-            parse_sql_stream(StringIO("""-- Schema: my-schema
+        with assert_raises_regex(ParseError,
+                                 "header is not an integer: version"):
+            parse_sql_stream(
+                StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- Version: INVALID
 -- API-Level: 3
@@ -118,24 +125,27 @@ UPDATE foo SET bar = 99;
 
     def test_api_level_missing(self) -> None:
         with assert_raises_regex(ParseError, "missing header: api-level"):
-            parse_sql_stream(StringIO("""-- Schema: my-schema
+            parse_sql_stream(
+                StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- Version: 3
             """), "")
 
     def test_api_level_is_not_an_int(self) -> None:
-        with assert_raises_regex(
-                ParseError, "header is not an integer: api-level"):
-            parse_sql_stream(StringIO("""-- Schema: my-schema
+        with assert_raises_regex(ParseError,
+                                 "header is not an integer: api-level"):
+            parse_sql_stream(
+                StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- Version: 24
 -- API-Level: INVALID
             """), "")
 
     def test_transaction_invalid(self) -> None:
-        with assert_raises_regex(
-                ParseError, "header must be 'yes' or 'no': transaction"):
-            parse_sql_stream(StringIO("""-- Schema: my-schema
+        with assert_raises_regex(ParseError,
+                                 "header must be 'yes' or 'no': transaction"):
+            parse_sql_stream(
+                StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- Version: 25
 -- API-Level: 3
@@ -144,7 +154,8 @@ UPDATE foo SET bar = 99;
 
     def test_ignore_headers_after_break(self) -> None:
         with assert_raises_regex(ParseError, "missing header: api-level"):
-            parse_sql_stream(StringIO("""-- Schema: my-schema
+            parse_sql_stream(
+                StringIO("""-- Schema: my-schema
 -- Dialect: sqlite
 -- Version: 13
 

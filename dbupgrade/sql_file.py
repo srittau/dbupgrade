@@ -65,13 +65,12 @@ def _bool_header(headers: Dict[str, str], header_name: str) -> bool:
     try:
         return _BOOL_VALUES[headers[header_name]]
     except KeyError:
-        raise ParseError(
-            "header must be 'yes' or 'no': " + header_name) from None
+        raise ParseError("header must be 'yes' or 'no': " +
+                         header_name) from None
 
 
 def _int_header(headers: Dict[str, str], header_name: str) -> int:
     try:
         return int(headers[header_name])
     except ValueError:
-        raise ParseError(
-            "header is not an integer: " + header_name) from None
+        raise ParseError("header is not an integer: " + header_name) from None

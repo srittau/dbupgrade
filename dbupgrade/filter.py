@@ -39,5 +39,4 @@ def filter_from_arguments(args: Arguments, version: int, api_level: int) \
 
     dialect = dialect_from_url(args.db_url)
 
-    return Filter(
-        args.schema, dialect, version, max_version, target_api_level)
+    return Filter(args.schema, dialect, version, max_version, target_api_level)

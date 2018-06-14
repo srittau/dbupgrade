@@ -43,7 +43,6 @@ def _execute_sql_ignore_errors(engine: Engine, query: str) -> None:
 
 
 class _EngineContext:
-
     def __init__(self, db_url: str) -> None:
         self._db_url = db_url
         self._engine = None  # type: Optional[Engine]
@@ -103,8 +102,13 @@ def _insert_default_version_info(engine: Engine, schema: str) -> None:
     engine.execute(query, schema=schema)
 
 
-def execute_stream(db_url: str, stream: IO[str], schema: str, version: int,
-                   api_level: int, *, transaction: bool = True) -> None:
+def execute_stream(db_url: str,
+                   stream: IO[str],
+                   schema: str,
+                   version: int,
+                   api_level: int,
+                   *,
+                   transaction: bool = True) -> None:
     with _EngineContext(db_url) as engine:
         with engine.begin() as conn:
             if not transaction:
@@ -112,9 +116,8 @@ def execute_stream(db_url: str, stream: IO[str], schema: str, version: int,
             _execute_stream_in_conn(conn, stream, schema, version, api_level)
 
 
-def _execute_stream_in_conn(
-        conn: Connection, stream: IO[str], schema: str,
-        version: int, api_level: int) -> None:
+def _execute_stream_in_conn(conn: Connection, stream: IO[str], schema: str,
+                            version: int, api_level: int) -> None:
     _execute_sql_stream(conn, stream)
     _update_versions(conn, schema, version, api_level)
 

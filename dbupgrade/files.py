@@ -4,7 +4,6 @@ from typing import List
 
 
 class FileInfo:
-
     def __init__(self, filename: str, schema: str, dialect: str, version: int,
                  api_level: int) -> None:
         self.filename = filename
@@ -26,5 +25,7 @@ class FileInfo:
 
 
 def collect_sql_files(directory: str) -> List[str]:
-    return [os.path.join(directory, fn) for fn
-            in listdir(directory) if fn.endswith(".sql")]
+    return [
+        os.path.join(directory, fn) for fn in listdir(directory)
+        if fn.endswith(".sql")
+    ]

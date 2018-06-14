@@ -10,7 +10,6 @@ from dbupgrade.args import parse_args
 
 
 class ParseArgsTest(TestCase):
-
     def setUp(self) -> None:
         sys.stdout = StringIO()
         sys.stderr = StringIO()

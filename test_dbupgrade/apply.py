@@ -7,7 +7,6 @@ from dbupgrade.files import FileInfo
 
 
 class ApplyFileTest(TestCase):
-
     def setUp(self) -> None:
         self._open_patch = patch("dbupgrade.apply.open")
         self._open = self._open_patch.start()
@@ -24,7 +23,8 @@ class ApplyFileTest(TestCase):
     def test_log(self) -> None:
         info = FileInfo("/foo/bar", "myschema", "sqlite", 45, 3)
         apply_file("sqlite:///", info)
-        self._logging.info.assert_called_once_with("applying #45 (API level 3)")
+        self._logging.info.assert_called_once_with(
+            "applying #45 (API level 3)")
 
     def test_execute__with_transaction(self) -> None:
         stream = StringIO("")

@@ -8,7 +8,6 @@ from dbupgrade.files import FileInfo, collect_sql_files
 
 
 class FileInfoTest(TestCase):
-
     def test_lt(self) -> None:
         fi1 = FileInfo("", "schema", "postgres", 4, 0)
         fi2 = FileInfo("", "schema", "postgres", 5, 0)
@@ -34,7 +33,6 @@ class FileInfoTest(TestCase):
 
 
 class CollectSQLFilesTest(TestCase):
-
     def test_filter_sql_files(self) -> None:
         with patch("dbupgrade.files.listdir") as listdir:
             listdir.return_value = ["foo", "bar.sql", "baz.sql"]

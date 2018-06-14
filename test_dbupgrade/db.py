@@ -16,7 +16,6 @@ from dbupgrade.db import \
 
 
 class FetchCurrentDBVersionsTest(TestCase):
-
     def setUp(self) -> None:
         self._create_engine_patch = patch("dbupgrade.db.create_engine")
         self._create_engine = self._create_engine_patch.start()
@@ -27,8 +26,10 @@ class FetchCurrentDBVersionsTest(TestCase):
         self._create_engine.stop()
 
     def _assert_execute_any_call(self, expected_query: str) -> None:
-        assert_true(any(str(c[0][0]) == expected_query
-                        for c in self._execute.call_args_list))
+        assert_true(
+            any(
+                str(c[0][0]) == expected_query
+                for c in self._execute.call_args_list))
 
     def _assert_execute_has_calls(self, expected_queries: Sequence[Any]) \
             -> None:
@@ -140,7 +141,6 @@ class FetchCurrentDBVersionsTest(TestCase):
 
 
 class ExecuteStreamTest(TestCase):
-
     def setUp(self) -> None:
         self._create_engine_patch = patch("dbupgrade.db.create_engine")
         self._create_engine = self._create_engine_patch.start()
@@ -152,8 +152,8 @@ class ExecuteStreamTest(TestCase):
     def tearDown(self) -> None:
         self._create_engine.stop()
 
-    def _assert_execute_has_calls(
-            self, execute_mock: Mock, expected_queries: Sequence[Any]) -> None:
+    def _assert_execute_has_calls(self, execute_mock: Mock,
+                                  expected_queries: Sequence[Any]) -> None:
         assert_equal(len(expected_queries), len(execute_mock.call_args_list))
         for c, ca in zip(expected_queries, execute_mock.call_args_list):
             cac = call(str(ca[0][0]), **ca[1])
@@ -170,14 +170,13 @@ class ExecuteStreamTest(TestCase):
         self._execute.side_effect = ValueError()
         with assert_raises(ValueError):
             sql = "SELECT * FROM foo"
-            execute_stream("sqlite:///", StringIO(sql),
-                           "myschema", 44, 13)
+            execute_stream("sqlite:///", StringIO(sql), "myschema", 44, 13)
         self._create_engine.return_value.dispose.assert_called_once_with()
 
     def test_execute_with_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
-        execute_stream("sqlite:///", StringIO(sql),
-                       "myschema", 44, 13, transaction=True)
+        execute_stream(
+            "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=True)
         self._conn.execution_options.assert_not_called()
         update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
         self._assert_execute_has_calls(self._execute, [
@@ -189,7 +188,7 @@ class ExecuteStreamTest(TestCase):
 
     def test_execute_without_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
-        execute_stream("sqlite:///", StringIO(sql),
-                       "myschema", 44, 13, transaction=False)
+        execute_stream(
+            "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=False)
         self._conn.execution_options.assert_called_with(
             isolation_level="AUTOCOMMIT")

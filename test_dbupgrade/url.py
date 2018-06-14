@@ -6,7 +6,6 @@ from dbupgrade.url import dialect_from_url
 
 
 class DialectFromURLTest(TestCase):
-
     def test_without_lib(self) -> None:
         url = "postgres://localhost/foo"
         dialect = dialect_from_url(url)

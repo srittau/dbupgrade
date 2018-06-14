@@ -7,7 +7,6 @@ from dbupgrade.upgrade import db_upgrade
 
 
 class DBUpgradeTest(TestCase):
-
     def setUp(self) -> None:
         self._logging_patch = patch("dbupgrade.upgrade.logging")
         self._logging = self._logging_patch.start()
@@ -31,17 +30,20 @@ class DBUpgradeTest(TestCase):
         self._parse_patch.stop()
         self._apply_patch.stop()
 
-    def _create_arguments(self, *, schema: str = "testschema",
+    def _create_arguments(self,
+                          *,
+                          schema: str = "testschema",
                           db_url: str = "postgres://localhost/foo",
                           script_path: str = "/tmp") -> Arguments:
-        return Arguments(schema, db_url, script_path,
-                         None, None, ignore_api_level=True)
+        return Arguments(
+            schema, db_url, script_path, None, None, ignore_api_level=True)
 
     def test_exercise(self) -> None:
         filenames = ["/tmp/foo", "/tmp/bar"]
         file_infos = [FileInfo("", "myschema", "postgres", 150, 30)]
         args = self._create_arguments(
-            schema="myschema", db_url="postgres://localhost/foo",
+            schema="myschema",
+            db_url="postgres://localhost/foo",
             script_path="/tmp")
         self._fetch_current_db_versions.return_value = 123, 44
         self._collect_sql_files.return_value = filenames
@@ -51,8 +53,8 @@ class DBUpgradeTest(TestCase):
             "postgres://localhost/foo", "myschema")
         self._collect_sql_files.assert_called_once_with("/tmp")
         self._parse_sql_files.assert_called_once_with(filenames)
-        self._apply_files.assert_called_once_with(
-            "postgres://localhost/foo", file_infos)
+        self._apply_files.assert_called_once_with("postgres://localhost/foo",
+                                                  file_infos)
 
     def test_filter(self) -> None:
         args = self._create_arguments()
@@ -77,8 +79,8 @@ class DBUpgradeTest(TestCase):
         with patch("dbupgrade.upgrade.filter_from_arguments") as ffa:
             ffa.return_value.matches.return_value = True
             db_upgrade(args)
-            self._apply_files.assert_called_once_with(
-                ANY, [fi122, fi123, fi124])
+            self._apply_files.assert_called_once_with(ANY,
+                                                      [fi122, fi123, fi124])
 
     def test_log(self) -> None:
         args = self._create_arguments()
