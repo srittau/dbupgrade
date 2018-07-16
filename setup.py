@@ -11,7 +11,7 @@ def read(filename):
 
 setup(
     name="dbupgrade",
-    version="0.2.2",
+    version="1.0.0",
     description="Database Migration Tool",
     long_description=read("README.rst"),
     author="Sebastian Rittau",
@@ -26,7 +26,7 @@ setup(
     ],
     license="MIT",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
