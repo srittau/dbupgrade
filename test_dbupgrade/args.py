@@ -24,9 +24,15 @@ class ParseArgsTest(TestCase):
         assert_equal("schema", args.schema)
         assert_equal("url", args.db_url)
         assert_equal("dir", args.script_path)
+        assert_false(args.quiet)
         assert_false(args.has_explicit_api_level)
         assert_false(args.ignore_api_level)
         assert_false(args.has_max_version)
+
+    @test
+    def small_q_option(self) -> None:
+        args = parse_args(["script", "-q", "schema", "url", "dir"])
+        assert_true(args.quiet)
 
     @test
     def small_l_option(self) -> None:

@@ -1,6 +1,11 @@
 News in dbupgrade 1.0.0
 =======================
 
+Improvements
+------------
+
+* Add `--quiet` option.
+
 News in dbupgrade 0.2.2
 =======================
 
