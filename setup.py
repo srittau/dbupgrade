@@ -19,6 +19,7 @@ setup(
     url="https://github.com/srittau/dbupgrade",
     packages=["dbupgrade"],
     scripts=[os.path.join("bin", "dbupgrade")],
+    python_requires=">= 3.5, < 3.8",
     install_requires=["sqlalchemy >= 1.0"],
     tests_require=[
         "asserts >= 0.8.1, < 0.9",
