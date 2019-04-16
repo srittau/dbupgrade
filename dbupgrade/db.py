@@ -120,8 +120,13 @@ def execute_stream(db_url: str,
             _execute_stream_in_conn(conn, stream, schema, version, api_level)
 
 
-def _execute_stream_in_conn(conn: Connection, stream: Iterable[str], schema: str,
-                            version: int, api_level: int) -> None:
+def _execute_stream_in_conn(
+    conn: Connection,
+    stream: Iterable[str],
+    schema: str,
+    version: int,
+    api_level: int,
+) -> None:
     _execute_sql_stream(conn, stream)
     _update_versions(conn, schema, version, api_level)
 

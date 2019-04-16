@@ -7,3 +7,4 @@ install:
 script:
   - python -m unittest discover -b -p "*.py" test_dbupgrade
   - mypy dbupgrade test_dbupgrade
+  - flake8 dbupgrade test_dbupgrade
