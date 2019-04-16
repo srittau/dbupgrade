@@ -22,8 +22,8 @@ setup(
     python_requires=">= 3.5, < 3.8",
     install_requires=["sqlalchemy >= 1.0"],
     tests_require=[
-        "asserts >= 0.8.1, < 0.9",
-        "dectest >= 0.1.2, < 0.2",
+        "asserts >= 0.8.1, < 0.10",
+        "dectest >= 1.0.0, < 2",
     ],
     license="MIT",
     classifiers=[
