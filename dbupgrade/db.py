@@ -32,7 +32,7 @@ SQL_UPDATE_VERSIONS = """
 
 def _quote_char(engine: Engine) -> str:
     dialect = engine.dialect.name.split("+")[0]
-    return '`' if dialect == "mysql" else '"'
+    return "`" if dialect == "mysql" else '"'
 
 
 def _execute_sql_ignore_errors(engine: Engine, query: str) -> None:
@@ -74,8 +74,9 @@ def fetch_current_db_versions(db_url: str, schema: str) -> Tuple[int, int]:
         return _fetch_or_create_version_info(engine, schema)
 
 
-def _fetch_or_create_version_info(engine: Engine, schema: str) \
-        -> Tuple[int, int]:
+def _fetch_or_create_version_info(
+    engine: Engine, schema: str
+) -> Tuple[int, int]:
     _try_creating_db_config_table(engine)
     versions = _try_fetching_version_info_for_schema(engine, schema)
     if versions:
@@ -91,8 +92,9 @@ def _try_creating_db_config_table(engine: Engine) -> None:
     _execute_sql_ignore_errors(engine, query)
 
 
-def _try_fetching_version_info_for_schema(engine: Engine, schema: str) \
-        -> Optional[Tuple[int, int]]:
+def _try_fetching_version_info_for_schema(
+    engine: Engine, schema: str
+) -> Optional[Tuple[int, int]]:
     sql = SQL_SELECT_VERSIONS.format(quote=_quote_char(engine))
     query = sa_text(sql)
     result = engine.execute(query, col=schema)
@@ -106,13 +108,15 @@ def _insert_default_version_info(engine: Engine, schema: str) -> None:
     engine.execute(query, schema=schema)
 
 
-def execute_stream(db_url: str,
-                   stream: Iterable[str],
-                   schema: str,
-                   version: int,
-                   api_level: int,
-                   *,
-                   transaction: bool = True) -> None:
+def execute_stream(
+    db_url: str,
+    stream: Iterable[str],
+    schema: str,
+    version: int,
+    api_level: int,
+    *,
+    transaction: bool = True
+) -> None:
     with _EngineContext(db_url) as engine:
         with engine.begin() as conn:
             if not transaction:
@@ -141,7 +145,8 @@ def _execute_sql_stream(conn: Connection, stream: Iterable[str]) -> None:
         conn.execute(escaped_query)
 
 
-def _update_versions(conn: Connection, schema: str, version: int,
-                     api_level: int) -> None:
+def _update_versions(
+    conn: Connection, schema: str, version: int, api_level: int
+) -> None:
     query = sa_text(SQL_UPDATE_VERSIONS.format(quote=_quote_char(conn.engine)))
     conn.execute(query, schema=schema, version=version, api_level=api_level)

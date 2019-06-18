@@ -58,7 +58,8 @@ class ParseArgsTest(TestCase):
         with assert_raises(SystemExit):
             with redirect_stderr(StringIO()):
                 parse_args(
-                    ["script", "-L", "-l", "25", "schema", "url", "dir"])
+                    ["script", "-L", "-l", "25", "schema", "url", "dir"]
+                )
 
     @test
     def small_m_option(self) -> None:

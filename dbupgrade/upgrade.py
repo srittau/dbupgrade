@@ -19,18 +19,18 @@ def create_filter(args: Arguments) -> Filter:
     version, api_level = fetch_current_db_versions(args.db_url, args.schema)
     logging.info(
         "current version: {version}, current API level: {api_level}".format(
-            version=version, api_level=api_level))
+            version=version, api_level=api_level
+        )
+    )
     return filter_from_arguments(args, version + 1, api_level)
 
 
-def read_files_to_apply(script_path: str, filter_: Filter) \
-        -> List[FileInfo]:
+def read_files_to_apply(script_path: str, filter_: Filter) -> List[FileInfo]:
     files = parse_sql_files(collect_sql_files(script_path))
     return filter_files(files, filter_)
 
 
-def filter_files(files: Sequence[FileInfo], filter_: Filter) \
-        -> List[FileInfo]:
+def filter_files(files: Sequence[FileInfo], filter_: Filter) -> List[FileInfo]:
     matching = [f for f in files if filter_.matches(f)]
     matching.sort()
     return matching

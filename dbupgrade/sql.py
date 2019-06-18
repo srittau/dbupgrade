@@ -71,4 +71,4 @@ class _SQLSplitter:
         return self._current_pos_startswith(_SQL_STRING_DELIMITER)
 
     def _current_pos_startswith(self, s: str) -> bool:
-        return self._line[self._pos:].startswith(s)
+        return self._line[self._pos :].startswith(s)

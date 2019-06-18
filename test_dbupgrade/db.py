@@ -2,18 +2,26 @@ from io import StringIO
 from typing import Any, Sequence
 from unittest.mock import call, Mock, MagicMock
 
-from asserts import \
-    assert_true, assert_equal, assert_raises, assert_is_instance
+from asserts import (
+    assert_true,
+    assert_equal,
+    assert_raises,
+    assert_is_instance,
+)
 
 from dectest import TestCase, test, before
 
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.elements import TextClause
 
-from dbupgrade.db import \
-    fetch_current_db_versions, execute_stream, \
-    SQL_CREATE_DB_CONFIG, SQL_SELECT_VERSIONS, SQL_INSERT_DEFAULT_VERSIONS, \
-    SQL_UPDATE_VERSIONS
+from dbupgrade.db import (
+    fetch_current_db_versions,
+    execute_stream,
+    SQL_CREATE_DB_CONFIG,
+    SQL_SELECT_VERSIONS,
+    SQL_INSERT_DEFAULT_VERSIONS,
+    SQL_UPDATE_VERSIONS,
+)
 
 
 class FetchCurrentDBVersionsTest(TestCase):
@@ -29,10 +37,13 @@ class FetchCurrentDBVersionsTest(TestCase):
         assert_true(
             any(
                 str(c[0][0]) == expected_query
-                for c in self._execute.call_args_list))
+                for c in self._execute.call_args_list
+            )
+        )
 
-    def _assert_execute_has_calls(self, expected_queries: Sequence[Any]) \
-            -> None:
+    def _assert_execute_has_calls(
+        self, expected_queries: Sequence[Any]
+    ) -> None:
         assert_equal(len(expected_queries), len(self._execute.call_args_list))
         for c, ca in zip(expected_queries, self._execute.call_args_list):
             cac = call(str(ca[0][0]), **ca[1])
@@ -42,7 +53,8 @@ class FetchCurrentDBVersionsTest(TestCase):
     def create_engine_called(self) -> None:
         fetch_current_db_versions("sqlite:///", "myschema")
         self._create_engine.assert_called_once_with(
-            "sqlite:///", convert_unicode=True)
+            "sqlite:///", convert_unicode=True
+        )
         self._create_engine.return_value.dispose.assert_called_once_with()
 
     @test
@@ -72,15 +84,18 @@ class FetchCurrentDBVersionsTest(TestCase):
                 raise AssertionError("unexpected SQL '{}'".format(sql))
 
         self._execute.side_effect = execute
-        version, api_level = \
-            fetch_current_db_versions("sqlite:///", "myschema")
+        version, api_level = fetch_current_db_versions(
+            "sqlite:///", "myschema"
+        )
         assert_equal(-1, version)
         assert_equal(0, api_level)
-        self._assert_execute_has_calls([
-            call(create_sql),
-            call(select_versions, col="myschema"),
-            call(insert_versions, schema="myschema"),
-        ])
+        self._assert_execute_has_calls(
+            [
+                call(create_sql),
+                call(select_versions, col="myschema"),
+                call(insert_versions, schema="myschema"),
+            ]
+        )
 
     @test
     def table_has_no_row_for_schema(self) -> None:
@@ -102,15 +117,18 @@ class FetchCurrentDBVersionsTest(TestCase):
                 raise AssertionError("unexpected SQL '{}'".format(sql))
 
         self._execute.side_effect = execute
-        version, api_level = \
-            fetch_current_db_versions("sqlite:///", "myschema")
+        version, api_level = fetch_current_db_versions(
+            "sqlite:///", "myschema"
+        )
         assert_equal(-1, version)
         assert_equal(0, api_level)
-        self._assert_execute_has_calls([
-            call(create_sql),
-            call(select_versions, col="myschema"),
-            call(insert_versions, schema="myschema"),
-        ])
+        self._assert_execute_has_calls(
+            [
+                call(create_sql),
+                call(select_versions, col="myschema"),
+                call(insert_versions, schema="myschema"),
+            ]
+        )
 
     @test
     def table_has_row(self) -> None:
@@ -129,14 +147,14 @@ class FetchCurrentDBVersionsTest(TestCase):
                 raise AssertionError("unexpected SQL '{}'".format(sql))
 
         self._execute.side_effect = execute
-        version, api_level = \
-            fetch_current_db_versions("sqlite:///", "myschema")
+        version, api_level = fetch_current_db_versions(
+            "sqlite:///", "myschema"
+        )
         assert_equal(123, version)
         assert_equal(34, api_level)
-        self._assert_execute_has_calls([
-            call(create_sql),
-            call(select_versions, col="myschema"),
-        ])
+        self._assert_execute_has_calls(
+            [call(create_sql), call(select_versions, col="myschema")]
+        )
 
     @test
     def mysql_quote_char(self) -> None:
@@ -161,8 +179,9 @@ class ExecuteStreamTest(TestCase):
     def _set_paramstyle(self, paramstyle: str) -> None:
         self.engine.dialect.paramstyle = paramstyle
 
-    def _assert_execute_has_calls(self, execute_mock: Mock,
-                                  expected_queries: Sequence[Any]) -> None:
+    def _assert_execute_has_calls(
+        self, execute_mock: Mock, expected_queries: Sequence[Any]
+    ) -> None:
         assert_equal(len(expected_queries), len(execute_mock.call_args_list))
         for c, ca in zip(expected_queries, execute_mock.call_args_list):
             cac = call(str(ca[0][0]), **ca[1])
@@ -173,7 +192,8 @@ class ExecuteStreamTest(TestCase):
         sql = "SELECT * FROM foo"
         execute_stream("sqlite:///", StringIO(sql), "myschema", 0, 0)
         self._create_engine.assert_called_once_with(
-            "sqlite:///", convert_unicode=True)
+            "sqlite:///", convert_unicode=True
+        )
         self._create_engine.return_value.dispose.assert_called_once_with()
 
     @test
@@ -188,23 +208,29 @@ class ExecuteStreamTest(TestCase):
     def execute_with_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         execute_stream(
-            "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=True)
+            "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=True
+        )
         self.connection.execution_options.assert_not_called()
         update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
-        self._assert_execute_has_calls(self._execute, [
-            call("SELECT * FROM foo"),
-            call("SELECT * FROM bar"),
-            call(update_sql, schema="myschema", version=44, api_level=13),
-        ])
+        self._assert_execute_has_calls(
+            self._execute,
+            [
+                call("SELECT * FROM foo"),
+                call("SELECT * FROM bar"),
+                call(update_sql, schema="myschema", version=44, api_level=13),
+            ],
+        )
         assert_is_instance(self._execute.call_args_list[2][0][0], TextClause)
 
     @test
     def execute_without_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         execute_stream(
-            "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=False)
+            "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=False
+        )
         self.connection.execution_options.assert_called_with(
-            isolation_level="AUTOCOMMIT")
+            isolation_level="AUTOCOMMIT"
+        )
 
     @test
     def escape_percent_signs__paramstyle_pyformat(self) -> None:
@@ -212,10 +238,13 @@ class ExecuteStreamTest(TestCase):
         sql = "SELECT 1 % 2"
         execute_stream("sqlite:///", StringIO(sql), "myschema", 44, 13)
         update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
-        self._assert_execute_has_calls(self._execute, [
-            call("SELECT 1 %% 2"),
-            call(update_sql, schema="myschema", version=44, api_level=13),
-        ])
+        self._assert_execute_has_calls(
+            self._execute,
+            [
+                call("SELECT 1 %% 2"),
+                call(update_sql, schema="myschema", version=44, api_level=13),
+            ],
+        )
 
     @test
     def escape_percent_signs__paramstyle_qmark(self) -> None:
@@ -223,7 +252,10 @@ class ExecuteStreamTest(TestCase):
         sql = "SELECT 1 % 2"
         execute_stream("sqlite:///", StringIO(sql), "myschema", 44, 13)
         update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
-        self._assert_execute_has_calls(self._execute, [
-            call("SELECT 1 % 2"),
-            call(update_sql, schema="myschema", version=44, api_level=13),
-        ])
+        self._assert_execute_has_calls(
+            self._execute,
+            [
+                call("SELECT 1 % 2"),
+                call(update_sql, schema="myschema", version=44, api_level=13),
+            ],
+        )

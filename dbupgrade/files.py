@@ -4,8 +4,14 @@ from typing import List
 
 
 class FileInfo:
-    def __init__(self, filename: str, schema: str, dialect: str, version: int,
-                 api_level: int) -> None:
+    def __init__(
+        self,
+        filename: str,
+        schema: str,
+        dialect: str,
+        version: int,
+        api_level: int,
+    ) -> None:
         self.filename = filename
         self.schema = schema
         self.dialect = dialect
@@ -20,12 +26,17 @@ class FileInfo:
 
     def __repr__(self) -> str:
         return "FileInfo({}, {}, {}, {}, {})".format(
-            repr(self.filename), repr(self.schema), repr(self.dialect),
-            self.version, self.api_level)
+            repr(self.filename),
+            repr(self.schema),
+            repr(self.dialect),
+            self.version,
+            self.api_level,
+        )
 
 
 def collect_sql_files(directory: str) -> List[str]:
     return [
-        os.path.join(directory, fn) for fn in listdir(directory)
+        os.path.join(directory, fn)
+        for fn in listdir(directory)
         if fn.endswith(".sql")
     ]

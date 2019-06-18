@@ -41,8 +41,9 @@ def parse_sql_stream(stream: Iterable[str], filename: str) -> FileInfo:
     return info
 
 
-_line_re = re.compile(r"^--\s+((?:[a-zA-Z][a-zA-Z0-9]*)"
-                      r"(?:-[a-zA-Z][a-zA-Z0-9]*)*):\s+(.*)$")
+_line_re = re.compile(
+    r"^--\s+((?:[a-zA-Z][a-zA-Z0-9]*)" r"(?:-[a-zA-Z][a-zA-Z0-9]*)*):\s+(.*)$"
+)
 
 
 def _parse_sql_headers(stream: Iterable[str]) -> Dict[str, str]:
@@ -56,16 +57,14 @@ def _parse_sql_headers(stream: Iterable[str]) -> Dict[str, str]:
 
 
 def _bool_header(headers: Dict[str, str], header_name: str) -> bool:
-    _BOOL_VALUES = {
-        "yes": True,
-        "no": False,
-    }
+    _BOOL_VALUES = {"yes": True, "no": False}
 
     try:
         return _BOOL_VALUES[headers[header_name]]
     except KeyError:
-        raise ParseError("header must be 'yes' or 'no': " +
-                         header_name) from None
+        raise ParseError(
+            "header must be 'yes' or 'no': " + header_name
+        ) from None
 
 
 def _int_header(headers: Dict[str, str], header_name: str) -> int:

@@ -33,8 +33,9 @@ class FileInfoTest(TestCase):
     @test
     def repr(self) -> None:
         fi = FileInfo("/foo/bar", "myschema", "postgres", 123, 13)
-        assert_equal("FileInfo('/foo/bar', 'myschema', 'postgres', 123, 13)",
-                     repr(fi))
+        assert_equal(
+            "FileInfo('/foo/bar', 'myschema', 'postgres', 123, 13)", repr(fi)
+        )
 
 
 class CollectSQLFilesTest(TestCase):

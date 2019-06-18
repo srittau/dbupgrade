@@ -54,40 +54,47 @@ class SplitSQLTest(TestCase):
     @test
     def semicolon_in_string(self) -> None:
         statements = self._call_string(
-            "SELECT * FROM foo WHERE t = 'foo;bar';")
+            "SELECT * FROM foo WHERE t = 'foo;bar';"
+        )
         assert_equal(["SELECT * FROM foo WHERE t = 'foo;bar'"], statements)
 
     @test
     def delimiter(self) -> None:
-        statements = self._call_string("""ABC;
+        statements = self._call_string(
+            """ABC;
   DELIMITER $
   XXX;
   YYY;ZZZ
   $
 DELIMITER ;
 DEF;GHI
-""")
+"""
+        )
         assert_equal(["ABC", "XXX;\n  YYY;ZZZ", "DEF", "GHI"], statements)
 
     @test
     def delimiter_at_eol(self) -> None:
-        statements = self._call_string("""
+        statements = self._call_string(
+            """
   DELIMITER $
   XXX;
   YYY$
 DELIMITER ;
 ABC
-""")
+"""
+        )
         assert_equal(["XXX;\n  YYY", "ABC"], statements)
 
     @test
     def multi_char_delimiter(self) -> None:
-        statements = self._call_string("""ABC;
+        statements = self._call_string(
+            """ABC;
   DELIMITER $$
   XXX;
   YYY;ZZZ
   $$
 DELIMITER ;
 DEF;GHI
-""")
+"""
+        )
         assert_equal(["ABC", "XXX;\n  YYY;ZZZ", "DEF", "GHI"], statements)

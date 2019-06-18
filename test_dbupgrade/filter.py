@@ -1,14 +1,23 @@
 from typing import Optional
 
-from asserts import \
-    assert_true, assert_false, assert_equal, assert_raises, assert_succeeds
+from asserts import (
+    assert_true,
+    assert_false,
+    assert_equal,
+    assert_raises,
+    assert_succeeds,
+)
 
 from dectest import TestCase, test
 
 from dbupgrade.args import Arguments
 from dbupgrade.files import FileInfo
-from dbupgrade.filter import Filter, filter_from_arguments, MAX_VERSION, \
-    MAX_API_LEVEL
+from dbupgrade.filter import (
+    Filter,
+    filter_from_arguments,
+    MAX_VERSION,
+    MAX_API_LEVEL,
+)
 
 
 class FilterTest(TestCase):
@@ -87,20 +96,23 @@ class FilterTest(TestCase):
 
 
 class FilterFromArgumentsTest(TestCase):
-    def _create_arguments(self,
-                          *,
-                          schema: str = "testschema",
-                          db_url: str = "postgres://localhost/foo",
-                          max_api_level: Optional[int] = None,
-                          max_version: Optional[int] = None,
-                          ignore_api_level: bool = False) -> Arguments:
+    def _create_arguments(
+        self,
+        *,
+        schema: str = "testschema",
+        db_url: str = "postgres://localhost/foo",
+        max_api_level: Optional[int] = None,
+        max_version: Optional[int] = None,
+        ignore_api_level: bool = False
+    ) -> Arguments:
         return Arguments(
             schema,
             db_url,
             "/tmp",
             max_api_level,
             max_version,
-            ignore_api_level=ignore_api_level)
+            ignore_api_level=ignore_api_level,
+        )
 
     @test
     def schema(self) -> None:
@@ -111,7 +123,8 @@ class FilterFromArgumentsTest(TestCase):
     @test
     def dialect(self) -> None:
         args = self._create_arguments(
-            db_url="postgres+psycopg2://localhost/foo")
+            db_url="postgres+psycopg2://localhost/foo"
+        )
         filter_ = filter_from_arguments(args, 0, 0)
         assert_equal("postgres", filter_.dialect)
 
@@ -136,7 +149,8 @@ class FilterFromArgumentsTest(TestCase):
     @test
     def target_api_level_default(self) -> None:
         args = self._create_arguments(
-            max_api_level=None, ignore_api_level=False)
+            max_api_level=None, ignore_api_level=False
+        )
         filter_ = filter_from_arguments(args, 0, 12)
         assert_equal(12, filter_.target_api_level)
 
