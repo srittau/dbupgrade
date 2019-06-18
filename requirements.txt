@@ -1,6 +1,6 @@
 # Direct dependencies
 asserts==0.9.1
-black==19.3b0
+black==19.3b0; python_version >= '3.6'
 dectest==1.1.0
 flake8==3.7.7
 mypy==0.701
