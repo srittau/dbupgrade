@@ -4,6 +4,7 @@ News in dbupgrade 2.0.0
 Incompatible Changes
 --------------------
 
+* Drop support for Python 3.5 and 3.6.
 * Use sqlparse to split SQL statements. While this will provide greater
   SQL compatibility overall, it may be incompatible with some existing
   SQL files.
