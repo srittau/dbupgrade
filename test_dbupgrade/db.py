@@ -1,4 +1,3 @@
-from io import StringIO
 from typing import Any, Sequence
 from unittest.mock import call, Mock, MagicMock
 
@@ -16,7 +15,7 @@ from sqlalchemy.sql.elements import TextClause
 
 from dbupgrade.db import (
     fetch_current_db_versions,
-    execute_stream,
+    update_sql,
     SQL_CREATE_DB_CONFIG,
     SQL_SELECT_VERSIONS,
     SQL_INSERT_DEFAULT_VERSIONS,
@@ -164,7 +163,7 @@ class FetchCurrentDBVersionsTest(TestCase):
         self._assert_execute_any_call(expected_query)
 
 
-class ExecuteStreamTest(TestCase):
+class UpdateSQLTest(TestCase):
     @before
     def setup_patches(self) -> None:
         self.engine = MagicMock()
@@ -190,7 +189,7 @@ class ExecuteStreamTest(TestCase):
     @test
     def create_engine_called(self) -> None:
         sql = "SELECT * FROM foo"
-        execute_stream("sqlite:///", StringIO(sql), "myschema", 0, 0)
+        update_sql("sqlite:///", sql, "myschema", 0, 0)
         self._create_engine.assert_called_once_with(
             "sqlite:///", convert_unicode=True
         )
@@ -201,23 +200,21 @@ class ExecuteStreamTest(TestCase):
         self._execute.side_effect = ValueError()
         with assert_raises(ValueError):
             sql = "SELECT * FROM foo"
-            execute_stream("sqlite:///", StringIO(sql), "myschema", 44, 13)
+            update_sql("sqlite:///", sql, "myschema", 44, 13)
         self._create_engine.return_value.dispose.assert_called_once_with()
 
     @test
     def execute_with_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
-        execute_stream(
-            "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=True
-        )
+        update_sql("sqlite:///", sql, "myschema", 44, 13, transaction=True)
         self.connection.execution_options.assert_not_called()
-        update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
+        sql2 = SQL_UPDATE_VERSIONS.format(quote='"')
         self._assert_execute_has_calls(
             self._execute,
             [
                 call("SELECT * FROM foo"),
                 call("SELECT * FROM bar"),
-                call(update_sql, schema="myschema", version=44, api_level=13),
+                call(sql2, schema="myschema", version=44, api_level=13),
             ],
         )
         assert_is_instance(self._execute.call_args_list[2][0][0], TextClause)
@@ -225,9 +222,7 @@ class ExecuteStreamTest(TestCase):
     @test
     def execute_without_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
-        execute_stream(
-            "sqlite:///", StringIO(sql), "myschema", 44, 13, transaction=False
-        )
+        update_sql("sqlite:///", sql, "myschema", 44, 13, transaction=False)
         self.connection.execution_options.assert_called_with(
             isolation_level="AUTOCOMMIT"
         )
@@ -236,13 +231,13 @@ class ExecuteStreamTest(TestCase):
     def escape_percent_signs__paramstyle_pyformat(self) -> None:
         self._set_paramstyle("pyformat")
         sql = "SELECT 1 % 2"
-        execute_stream("sqlite:///", StringIO(sql), "myschema", 44, 13)
-        update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
+        update_sql("sqlite:///", sql, "myschema", 44, 13)
+        sql2 = SQL_UPDATE_VERSIONS.format(quote='"')
         self._assert_execute_has_calls(
             self._execute,
             [
                 call("SELECT 1 %% 2"),
-                call(update_sql, schema="myschema", version=44, api_level=13),
+                call(sql2, schema="myschema", version=44, api_level=13),
             ],
         )
 
@@ -250,12 +245,12 @@ class ExecuteStreamTest(TestCase):
     def escape_percent_signs__paramstyle_qmark(self) -> None:
         self._set_paramstyle("qmark")
         sql = "SELECT 1 % 2"
-        execute_stream("sqlite:///", StringIO(sql), "myschema", 44, 13)
-        update_sql = SQL_UPDATE_VERSIONS.format(quote='"')
+        update_sql("sqlite:///", sql, "myschema", 44, 13)
+        sql2 = SQL_UPDATE_VERSIONS.format(quote='"')
         self._assert_execute_has_calls(
             self._execute,
             [
                 call("SELECT 1 % 2"),
-                call(update_sql, schema="myschema", version=44, api_level=13),
+                call(sql2, schema="myschema", version=44, api_level=13),
             ],
         )

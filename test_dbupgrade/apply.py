@@ -11,7 +11,7 @@ class ApplyFileTest(TestCase):
     def setup_patches(self) -> None:
         self._open = self.patch("dbupgrade.apply.open")
         self._logging = self.patch("dbupgrade.apply.logging")
-        self._execute_stream = self.patch("dbupgrade.apply.execute_stream")
+        self._update_sql = self.patch("dbupgrade.apply.update_sql")
 
     @test
     def log(self) -> None:
@@ -23,24 +23,22 @@ class ApplyFileTest(TestCase):
 
     @test
     def execute__with_transaction(self) -> None:
-        stream = StringIO("")
-        self._open.return_value = stream
+        self._open.return_value = StringIO("")
         info = FileInfo("/foo/bar", "myschema", "sqlite", 45, 3)
         info.transaction = True
         apply_file("sqlite:///", info)
         self._open.assert_called_once_with("/foo/bar", "r")
-        self._execute_stream.assert_called_once_with(
-            "sqlite:///", stream, "myschema", 45, 3, transaction=True
+        self._update_sql.assert_called_once_with(
+            "sqlite:///", "", "myschema", 45, 3, transaction=True
         )
 
     @test
     def execute__without_transaction(self) -> None:
-        stream = StringIO("")
-        self._open.return_value = stream
+        self._open.return_value = StringIO("")
         info = FileInfo("/foo/bar", "myschema", "sqlite", 45, 3)
         info.transaction = False
         apply_file("sqlite:///", info)
         self._open.assert_called_once_with("/foo/bar", "r")
-        self._execute_stream.assert_called_once_with(
-            "sqlite:///", stream, "myschema", 45, 3, transaction=False
+        self._update_sql.assert_called_once_with(
+            "sqlite:///", "", "myschema", 45, 3, transaction=False
         )

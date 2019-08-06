@@ -1,5 +1,4 @@
 from asserts import assert_equal
-from io import StringIO
 from typing import List
 
 from dectest import TestCase, test
@@ -9,7 +8,7 @@ from dbupgrade.sql import split_sql
 
 class SplitSQLTest(TestCase):
     def _call_string(self, s: str) -> List[str]:
-        return list(split_sql(StringIO(s)))
+        return list(split_sql(s))
 
     @test
     def empty_stream(self) -> None:

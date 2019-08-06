@@ -1,7 +1,7 @@
 import logging
 from typing import Sequence
 
-from dbupgrade.db import execute_stream
+from dbupgrade.db import update_sql
 from dbupgrade.files import FileInfo
 
 
@@ -15,9 +15,10 @@ def apply_file(db_url: str, file_info: FileInfo) -> None:
         "applying #{0.version} (API level {0.api_level})".format(file_info)
     )
     with open(file_info.filename, "r") as stream:
-        execute_stream(
+        sql = stream.read()
+        update_sql(
             db_url,
-            stream,
+            sql,
             file_info.schema,
             file_info.version,
             file_info.api_level,

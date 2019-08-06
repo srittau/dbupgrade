@@ -1,4 +1,4 @@
-from typing import Tuple, Any, Optional, List, Iterable
+from typing import Tuple, Any, Optional, List
 
 from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Engine, Connection
@@ -108,9 +108,9 @@ def _insert_default_version_info(engine: Engine, schema: str) -> None:
     engine.execute(query, schema=schema)
 
 
-def execute_stream(
+def update_sql(
     db_url: str,
-    stream: Iterable[str],
+    sql: str,
     schema: str,
     version: int,
     api_level: int,
@@ -121,23 +121,19 @@ def execute_stream(
         with engine.begin() as conn:
             if not transaction:
                 conn.execution_options(isolation_level="AUTOCOMMIT")
-            _execute_stream_in_conn(conn, stream, schema, version, api_level)
+            _update_sql_in_conn(conn, sql, schema, version, api_level)
 
 
-def _execute_stream_in_conn(
-    conn: Connection,
-    stream: Iterable[str],
-    schema: str,
-    version: int,
-    api_level: int,
+def _update_sql_in_conn(
+    conn: Connection, sql: str, schema: str, version: int, api_level: int
 ) -> None:
-    _execute_sql_stream(conn, stream)
+    _execute_sql_stream(conn, sql)
     _update_versions(conn, schema, version, api_level)
 
 
-def _execute_sql_stream(conn: Connection, stream: Iterable[str]) -> None:
+def _execute_sql_stream(conn: Connection, sql: str) -> None:
     """Run the SQL statements in a stream against a database."""
-    for query in split_sql(stream):
+    for query in split_sql(sql):
         if _should_escape_percents(conn):
             escaped_query = query.replace("%", "%%")
         else:
