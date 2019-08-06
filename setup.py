@@ -11,7 +11,7 @@ def read(filename):
 
 setup(
     name="dbupgrade",
-    version="1.0.0",
+    version="2.0.0",
     description="Database Migration Tool",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
@@ -21,11 +21,8 @@ setup(
     packages=["dbupgrade"],
     scripts=[os.path.join("bin", "dbupgrade")],
     python_requires=">= 3.5, < 3.8",
-    install_requires=["sqlalchemy >= 1.0"],
-    tests_require=[
-        "asserts >= 0.8.1, < 0.10",
-        "dectest >= 1.0.0, < 2",
-    ],
+    install_requires=["sqlalchemy >= 1.0", "sqlparse >= 0.3.0"],
+    tests_require=["asserts >= 0.8.1, < 0.10", "dectest >= 1.0.0, < 2"],
     license="MIT",
     classifiers=[
         "Development Status :: 5 - Production/Stable",

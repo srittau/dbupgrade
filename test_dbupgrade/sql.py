@@ -48,7 +48,7 @@ class SplitSQLTest(TestCase):
     @test
     def end_of_line_comment(self) -> None:
         statements = self._call_string("SELECT * -- some comment\nFROM foo;")
-        assert_equal(["SELECT * FROM foo"], statements)
+        assert_equal(["SELECT * \nFROM foo"], statements)
 
     @test
     def semicolon_in_string(self) -> None:

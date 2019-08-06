@@ -1,3 +1,13 @@
+News in dbupgrade 2.0.0
+=======================
+
+Incompatible Changes
+--------------------
+
+* Use sqlparse to split SQL statements. While this will provide greater
+  SQL compatibility overall, it may be incompatible with some existing
+  SQL files.
+
 News in dbupgrade 1.0.0
 =======================
 
