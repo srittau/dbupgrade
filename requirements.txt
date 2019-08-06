@@ -1,10 +1,10 @@
 # Direct dependencies
 asserts==0.9.1
 black==19.3b0; python_version >= '3.6'
-dectest==1.1.0
-flake8==3.7.7
-mypy==0.701
-SQLAlchemy==1.3.5
+dectest==1.1.1
+flake8==3.7.8
+mypy==0.720
+SQLAlchemy==1.3.6
 wheel==0.33.4
 
 # Indirect dependencies
@@ -17,4 +17,4 @@ mypy-extensions==0.4.1
 pycodestyle==2.5.0
 pyflakes==2.1.1
 toml==0.10.0
-typed-ast==1.3.5
+typed-ast==1.4.0
