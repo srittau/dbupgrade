@@ -1,5 +1,5 @@
 # Direct dependencies
-asserts==0.9.1
+asserts==0.10.0
 black==19.3b0
 dectest==1.1.1
 flake8==3.7.8
