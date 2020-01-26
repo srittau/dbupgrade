@@ -1,6 +1,6 @@
 from io import StringIO
 
-from dectest import TestCase, test, before
+from dectest import TestCase, before, test
 
 from dbupgrade.apply import apply_file
 from dbupgrade.files import FileInfo

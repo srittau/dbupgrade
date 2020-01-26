@@ -1,6 +1,6 @@
-from unittest.mock import patch, ANY
+from unittest.mock import ANY, patch
 
-from dectest import TestCase, test, before
+from dectest import TestCase, before, test
 
 from dbupgrade.args import Arguments
 from dbupgrade.files import FileInfo

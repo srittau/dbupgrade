@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, Namespace
-from typing import Sequence, Optional
+from typing import Optional, Sequence
 
 
 class Arguments:

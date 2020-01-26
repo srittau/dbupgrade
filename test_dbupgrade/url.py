@@ -1,5 +1,4 @@
 from asserts import assert_equal
-
 from dectest import TestCase, test
 
 from dbupgrade.url import dialect_from_url

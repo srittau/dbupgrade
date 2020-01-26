@@ -1,8 +1,7 @@
 import os.path
 from unittest.mock import patch
 
-from asserts import assert_true, assert_false, assert_raises, assert_equal
-
+from asserts import assert_equal, assert_false, assert_raises, assert_true
 from dectest import TestCase, test
 
 from dbupgrade.files import FileInfo, collect_sql_files

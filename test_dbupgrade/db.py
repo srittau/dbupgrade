@@ -1,25 +1,23 @@
 from typing import Any, Sequence
-from unittest.mock import call, Mock, MagicMock
+from unittest.mock import MagicMock, Mock, call
 
 from asserts import (
-    assert_true,
     assert_equal,
-    assert_raises,
     assert_is_instance,
+    assert_raises,
+    assert_true,
 )
-
-from dectest import TestCase, test, before
-
+from dectest import TestCase, before, test
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.elements import TextClause
 
 from dbupgrade.db import (
+    SQL_CREATE_DB_CONFIG,
+    SQL_INSERT_DEFAULT_VERSIONS,
+    SQL_SELECT_VERSIONS,
+    SQL_UPDATE_VERSIONS,
     fetch_current_db_versions,
     update_sql,
-    SQL_CREATE_DB_CONFIG,
-    SQL_SELECT_VERSIONS,
-    SQL_INSERT_DEFAULT_VERSIONS,
-    SQL_UPDATE_VERSIONS,
 )
 
 

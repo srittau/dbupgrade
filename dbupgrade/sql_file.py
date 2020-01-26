@@ -1,7 +1,7 @@
 import logging
 import os.path
 import re
-from typing import Sequence, List, Dict, Iterable
+from typing import Dict, Iterable, List, Sequence
 
 from dbupgrade.files import FileInfo
 

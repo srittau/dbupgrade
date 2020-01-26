@@ -1,22 +1,21 @@
 from typing import Optional
 
 from asserts import (
-    assert_true,
-    assert_false,
     assert_equal,
+    assert_false,
     assert_raises,
     assert_succeeds,
+    assert_true,
 )
-
 from dectest import TestCase, test
 
 from dbupgrade.args import Arguments
 from dbupgrade.files import FileInfo
 from dbupgrade.filter import (
+    MAX_API_LEVEL,
+    MAX_VERSION,
     Filter,
     filter_from_arguments,
-    MAX_VERSION,
-    MAX_API_LEVEL,
 )
 
 

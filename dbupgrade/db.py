@@ -1,7 +1,7 @@
-from typing import Tuple, Any, Optional, List
+from typing import Any, List, Optional, Tuple
 
 from sqlalchemy import create_engine, text as sa_text
-from sqlalchemy.engine import Engine, Connection
+from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import SQLAlchemyError
 
 from dbupgrade.sql import split_sql

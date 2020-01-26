@@ -1,3 +1,9 @@
+News in dbupgrade 2.1.0
+=======================
+
+Improvements
+------------
+
 News in dbupgrade 2.0.0
 =======================
 

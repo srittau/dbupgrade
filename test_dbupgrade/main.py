@@ -1,6 +1,6 @@
 import logging
 
-from dectest import TestCase, test, before
+from dectest import TestCase, before, test
 
 from dbupgrade.args import Arguments
 from dbupgrade.main import main

@@ -1,9 +1,7 @@
 from contextlib import redirect_stderr, redirect_stdout
-
 from io import StringIO
 
-from asserts import assert_false, assert_true, assert_equal, assert_raises
-
+from asserts import assert_equal, assert_false, assert_raises, assert_true
 from dectest import TestCase, test
 
 from dbupgrade.args import parse_args

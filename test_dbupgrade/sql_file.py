@@ -1,19 +1,18 @@
 import os.path
 from io import StringIO
 from typing import TextIO
-from unittest.mock import patch, mock_open, call, ANY
+from unittest.mock import ANY, call, mock_open, patch
 
 from asserts import (
-    assert_false,
-    assert_true,
     assert_equal,
+    assert_false,
     assert_raises_regex,
+    assert_true,
 )
-
 from dectest import TestCase, test
 
 from dbupgrade.files import FileInfo
-from dbupgrade.sql_file import parse_sql_files, ParseError, parse_sql_stream
+from dbupgrade.sql_file import ParseError, parse_sql_files, parse_sql_stream
 
 
 class ParseSQLFilesTest(TestCase):

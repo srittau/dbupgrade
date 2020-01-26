@@ -1,6 +1,6 @@
-from asserts import assert_equal
 from typing import List
 
+from asserts import assert_equal
 from dectest import TestCase, test
 
 from dbupgrade.sql import split_sql

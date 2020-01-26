@@ -56,5 +56,4 @@ an error message and a non-zero return status.
 
 from dbupgrade.main import main
 
-
 main()
