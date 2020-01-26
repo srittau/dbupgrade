@@ -1,5 +1,7 @@
-*.egg-info
-build
-dist
-.mypy_cache
+/*.egg-info
+/.mypy_cache
+/.venv*
+/build
+/dist
+
 __pycache__
