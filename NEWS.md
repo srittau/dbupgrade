@@ -1,8 +1,10 @@
-News in dbupgrade 2.1.0
+News in dbupgrade 2.0.1
 =======================
 
-Improvements
-------------
+Bug Fixes
+---------
+
+* Fix a warning about isolation_level when using `-- Transaction: no`.
 
 News in dbupgrade 2.0.0
 =======================

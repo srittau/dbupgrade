@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Mapping, Optional, Tuple
 
 from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Connection, Engine
@@ -43,12 +43,13 @@ def _execute_sql_ignore_errors(engine: Engine, query: str) -> None:
 
 
 class _EngineContext:
-    def __init__(self, db_url: str) -> None:
+    def __init__(self, db_url: str, **kwargs: Mapping[str, Any]) -> None:
         self._db_url = db_url
-        self._engine = None  # type: Optional[Engine]
+        self._kwargs = kwargs
+        self._engine: Optional[Engine] = None
 
     def __enter__(self) -> Engine:
-        self._engine = create_engine(self._db_url)
+        self._engine = create_engine(self._db_url, **self._kwargs)
         return self._engine
 
     def __exit__(self, _: Any, __: Any, ___: Any) -> None:
@@ -117,10 +118,9 @@ def update_sql(
     *,
     transaction: bool = True
 ) -> None:
-    with _EngineContext(db_url) as engine:
+    kwargs = {} if transaction else {"isolation_level": "AUTOCOMMIT"}
+    with _EngineContext(db_url, **kwargs) as engine:
         with engine.begin() as conn:
-            if not transaction:
-                conn.execution_options(isolation_level="AUTOCOMMIT")
             _update_sql_in_conn(conn, sql, schema, version, api_level)
 
 

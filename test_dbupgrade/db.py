@@ -201,7 +201,7 @@ class UpdateSQLTest(TestCase):
     def execute_with_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         update_sql("sqlite:///", sql, "myschema", 44, 13, transaction=True)
-        self.connection.execution_options.assert_not_called()
+        self._create_engine.assert_called_once_with("sqlite:///")
         sql2 = SQL_UPDATE_VERSIONS.format(quote='"')
         self._assert_execute_has_calls(
             self._execute,
@@ -217,8 +217,8 @@ class UpdateSQLTest(TestCase):
     def execute_without_transaction(self) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         update_sql("sqlite:///", sql, "myschema", 44, 13, transaction=False)
-        self.connection.execution_options.assert_called_with(
-            isolation_level="AUTOCOMMIT"
+        self._create_engine.assert_called_once_with(
+            "sqlite:///", isolation_level="AUTOCOMMIT"
         )
 
     @test
