@@ -48,7 +48,7 @@ class _EngineContext:
         self._engine = None  # type: Optional[Engine]
 
     def __enter__(self) -> Engine:
-        self._engine = create_engine(self._db_url, convert_unicode=True)
+        self._engine = create_engine(self._db_url)
         return self._engine
 
     def __exit__(self, _: Any, __: Any, ___: Any) -> None:

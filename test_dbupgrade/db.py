@@ -49,9 +49,7 @@ class FetchCurrentDBVersionsTest(TestCase):
     @test
     def create_engine_called(self) -> None:
         fetch_current_db_versions("sqlite:///", "myschema")
-        self._create_engine.assert_called_once_with(
-            "sqlite:///", convert_unicode=True
-        )
+        self._create_engine.assert_called_once_with("sqlite:///")
         self._create_engine.return_value.dispose.assert_called_once_with()
 
     @test
@@ -188,9 +186,7 @@ class UpdateSQLTest(TestCase):
     def create_engine_called(self) -> None:
         sql = "SELECT * FROM foo"
         update_sql("sqlite:///", sql, "myschema", 0, 0)
-        self._create_engine.assert_called_once_with(
-            "sqlite:///", convert_unicode=True
-        )
+        self._create_engine.assert_called_once_with("sqlite:///")
         self._create_engine.return_value.dispose.assert_called_once_with()
 
     @test
