@@ -1,4 +1,4 @@
-from typing import Any, List, Mapping, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Connection, Engine
@@ -43,7 +43,7 @@ def _execute_sql_ignore_errors(engine: Engine, query: str) -> None:
 
 
 class _EngineContext:
-    def __init__(self, db_url: str, **kwargs: Mapping[str, Any]) -> None:
+    def __init__(self, db_url: str, **kwargs: Any) -> None:
         self._db_url = db_url
         self._kwargs = kwargs
         self._engine: Optional[Engine] = None
