@@ -5,18 +5,21 @@ dectest==1.1.1
 flake8==3.7.9
 isort==4.3.21
 mypy==0.770
-SQLAlchemy==1.3.16
+SQLAlchemy==1.3.17
 sqlparse==0.3.1
 wheel==0.34.2
 
 # Indirect dependencies
-appdirs==1.4.3
+appdirs==1.4.4
 attrs==19.3.0
 Click==7.1.2
 entrypoints==0.3
 mccabe==0.6.1
 mypy-extensions==0.4.3
+pathspec==0.8.0
 pycodestyle==2.5.0
 pyflakes==2.2.0
-toml==0.10.0
+regex==2020.5.14
+toml==0.10.1
 typed-ast==1.4.1
+typing-extensions==3.7.4.2
