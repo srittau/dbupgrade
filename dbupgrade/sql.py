@@ -50,7 +50,7 @@ def _unescape_delimiters(stmt: str) -> str:
 
 def _process_statement(stmt: str) -> str:
     stmt = stmt.rstrip(";")
-    lines = [_remove_comment(l) for l in stmt.splitlines()]
+    lines = [_remove_comment(line) for line in stmt.splitlines()]
     return "\n".join(lines).strip()
 
 
