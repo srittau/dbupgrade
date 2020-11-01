@@ -22,7 +22,7 @@ setup(
     scripts=[os.path.join("bin", "dbupgrade")],
     python_requires=">= 3.7",
     install_requires=["sqlalchemy >= 1.0", "sqlparse >= 0.3.0"],
-    tests_require=["asserts >= 0.8.1, < 0.11", "dectest >= 1.0.0, < 2"],
+    tests_require=["asserts >= 0.8.1, < 0.12", "dectest >= 1.0.0, < 2"],
     license="MIT",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
