@@ -20,5 +20,5 @@ pycodestyle==2.7.0
 pyflakes==2.3.1
 regex==2021.3.17
 toml==0.10.2
-typed-ast==1.4.2
+typed-ast==1.4.3
 typing-extensions==3.7.4.3
