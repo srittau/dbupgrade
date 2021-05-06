@@ -1,10 +1,16 @@
+News in dbupgrade 2.1.0
+=======================
+
+* Add `dbupgrade.__main__`. `dbupgrade` can now be executed using
+  `python3 -m dbupgrade`.
+
 News in dbupgrade 2.0.1
 =======================
 
 Bug Fixes
 ---------
 
-* Fix a warning about isolation_level when using `-- Transaction: no`.
+* Fix a warning about isolation\_level when using `-- Transaction: no`.
 
 News in dbupgrade 2.0.0
 =======================
