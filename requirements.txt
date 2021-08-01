@@ -5,7 +5,7 @@ dectest==1.1.1
 flake8==3.9.2
 isort==5.9.1
 mypy==0.910
-SQLAlchemy==1.4.20
+SQLAlchemy==1.4.22
 sqlparse==0.4.1
 wheel==0.36.2
 
