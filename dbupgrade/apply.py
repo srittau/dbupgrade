@@ -1,13 +1,19 @@
 import logging
 from typing import Sequence
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from dbupgrade.db import update_sql
 from dbupgrade.files import FileInfo
 
 
 def apply_files(db_url: str, files: Sequence[FileInfo]) -> None:
     for file_info in files:
-        apply_file(db_url, file_info)
+        try:
+            apply_file(db_url, file_info)
+        except SQLAlchemyError as exc:
+            logging.error(str(exc))
+            return
 
 
 def apply_file(db_url: str, file_info: FileInfo) -> None:

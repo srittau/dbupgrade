@@ -1,6 +1,9 @@
 News in dbupgrade 2.1.1
 =======================
 
+* Print proper error message, instead of a traceback when encountering
+  an SQL error.
+
 News in dbupgrade 2.1.0
 =======================
 
