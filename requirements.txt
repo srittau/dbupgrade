@@ -5,7 +5,7 @@ dectest==1.1.1
 flake8==3.9.2
 isort==5.9.3
 mypy==0.910
-SQLAlchemy==1.4.25
+SQLAlchemy==1.4.26
 sqlparse==0.4.2
 
 # Build dependencies
