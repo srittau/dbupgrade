@@ -1,3 +1,8 @@
+News in dbupgrade 2.2.0
+=======================
+
+* Return with exit code 1 when encounterin an SQL error.
+
 News in dbupgrade 2.1.1
 =======================
 

@@ -10,6 +10,7 @@ def main() -> None:
         args = parse_args(sys.argv)
         log_level = logging.WARNING if args.quiet else logging.INFO
         logging.basicConfig(level=log_level)
-        db_upgrade(args)
+        if not db_upgrade(args):
+            sys.exit(1)
     except KeyboardInterrupt:
         pass

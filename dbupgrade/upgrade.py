@@ -9,10 +9,10 @@ from dbupgrade.filter import Filter, filter_from_arguments
 from dbupgrade.sql_file import parse_sql_files
 
 
-def db_upgrade(args: Arguments) -> None:
+def db_upgrade(args: Arguments) -> bool:
     filter_ = create_filter(args)
     files = read_files_to_apply(args.script_path, filter_)
-    apply_files(args.db_url, files)
+    return apply_files(args.db_url, files)
 
 
 def create_filter(args: Arguments) -> Filter:
