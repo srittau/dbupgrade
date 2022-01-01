@@ -4,7 +4,7 @@ black==21.11b1
 dectest==1.1.1
 flake8==4.0.1
 isort==5.10.1
-mypy==0.910
+mypy==0.930
 SQLAlchemy==1.4.27
 sqlparse==0.4.2
 
