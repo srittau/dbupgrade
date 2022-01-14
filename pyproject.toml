@@ -35,6 +35,11 @@ dectest = ">=1.0.0,<2"
 flake8 = "^4.0.1"
 isort = "^5.10.1"
 mypy = "0.930"
+pytest = "^6.2.5"
+pytest-mock = "^3.6.1"
+
+[tool.pytest.ini_options]
+python_files = ["test_*/*.py"]
 
 [tool.black]
 line-length = 79

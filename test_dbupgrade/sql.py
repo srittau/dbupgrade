@@ -1,64 +1,51 @@
 from typing import List
 
-from asserts import assert_equal
-from dectest import TestCase, test
-
 from dbupgrade.sql import split_sql
 
 
-class SplitSQLTest(TestCase):
+class TestSplitSQL:
     def _call_string(self, s: str) -> List[str]:
         return list(split_sql(s))
 
-    @test
-    def empty_stream(self) -> None:
+    def test_empty_stream(self) -> None:
         statements = self._call_string("")
-        assert_equal(0, len(statements))
+        assert len(statements) == 0
 
-    @test
-    def one_statement(self) -> None:
+    def test_one_statement(self) -> None:
         statements = self._call_string("SELECT * FROM foo;")
-        assert_equal(["SELECT * FROM foo"], statements)
+        assert statements == ["SELECT * FROM foo"]
 
-    @test
-    def multi_line_statement(self) -> None:
+    def test_multi_line_statement(self) -> None:
         statements = self._call_string("SELECT *\nFROM foo;")
-        assert_equal(["SELECT *\nFROM foo"], statements)
+        assert statements == ["SELECT *\nFROM foo"]
 
-    @test
-    def two_statements(self) -> None:
+    def test_two_statements(self) -> None:
         statements = self._call_string("SELECT * FROM foo;\nDELETE FROM foo;")
-        assert_equal(["SELECT * FROM foo", "DELETE FROM foo"], statements)
+        assert statements == ["SELECT * FROM foo", "DELETE FROM foo"]
 
-    @test
-    def two_statements__missing_semicolon(self) -> None:
+    def test_two_statements__missing_semicolon(self) -> None:
         statements = self._call_string("SELECT * FROM foo;\nDELETE FROM foo")
-        assert_equal(["SELECT * FROM foo", "DELETE FROM foo"], statements)
+        assert statements == ["SELECT * FROM foo", "DELETE FROM foo"]
 
-    @test
-    def double_semicolon(self) -> None:
+    def test_double_semicolon(self) -> None:
         statements = self._call_string("SELECT * FROM foo;; DELETE FROM foo")
-        assert_equal(["SELECT * FROM foo", "DELETE FROM foo"], statements)
+        assert statements == ["SELECT * FROM foo", "DELETE FROM foo"]
 
-    @test
-    def full_line_comment(self) -> None:
+    def test_full_line_comment(self) -> None:
         statements = self._call_string("-- some comment")
-        assert_equal([], statements)
+        assert statements == []
 
-    @test
-    def end_of_line_comment(self) -> None:
+    def test_end_of_line_comment(self) -> None:
         statements = self._call_string("SELECT * -- some comment\nFROM foo;")
-        assert_equal(["SELECT * \nFROM foo"], statements)
+        assert statements == ["SELECT * \nFROM foo"]
 
-    @test
-    def semicolon_in_string(self) -> None:
+    def test_semicolon_in_string(self) -> None:
         statements = self._call_string(
             "SELECT * FROM foo WHERE t = 'foo;bar';"
         )
-        assert_equal(["SELECT * FROM foo WHERE t = 'foo;bar'"], statements)
+        assert statements == ["SELECT * FROM foo WHERE t = 'foo;bar'"]
 
-    @test
-    def delimiter(self) -> None:
+    def test_delimiter(self) -> None:
         statements = self._call_string(
             """ABC;
   DELIMITER $
@@ -69,10 +56,9 @@ DELIMITER ;
 DEF;GHI
 """
         )
-        assert_equal(["ABC", "XXX;\n  YYY;ZZZ", "DEF", "GHI"], statements)
+        assert statements == ["ABC", "XXX;\n  YYY;ZZZ", "DEF", "GHI"]
 
-    @test
-    def delimiter_at_eol(self) -> None:
+    def test_delimiter_at_eol(self) -> None:
         statements = self._call_string(
             """
   DELIMITER $
@@ -82,10 +68,9 @@ DELIMITER ;
 ABC
 """
         )
-        assert_equal(["XXX;\n  YYY", "ABC"], statements)
+        assert statements == ["XXX;\n  YYY", "ABC"]
 
-    @test
-    def multi_char_delimiter(self) -> None:
+    def test_multi_char_delimiter(self) -> None:
         statements = self._call_string(
             """ABC;
   DELIMITER $$
@@ -96,4 +81,4 @@ DELIMITER ;
 DEF;GHI
 """
         )
-        assert_equal(["ABC", "XXX;\n  YYY;ZZZ", "DEF", "GHI"], statements)
+        assert statements == ["ABC", "XXX;\n  YYY;ZZZ", "DEF", "GHI"]

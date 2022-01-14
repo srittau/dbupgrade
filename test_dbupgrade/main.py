@@ -1,30 +1,36 @@
 import logging
+from unittest.mock import Mock
 
-from dectest import TestCase, before, test
+import pytest
+from pytest_mock import MockerFixture
 
 from dbupgrade.args import Arguments
 from dbupgrade.main import main
 
 
-class MainTest(TestCase):
-    @before
-    def setup_patches(self) -> None:
-        self.args = Arguments("myschema", "sqlite:///", "/tmp")
-        self.logging = self.patch("dbupgrade.main.logging")
-        self.logging.INFO = logging.INFO
-        self.logging.WARNING = logging.WARNING
-        self.parse_args = self.patch("dbupgrade.main.parse_args")
-        self.parse_args.return_value = self.args
-        self.db_upgrade = self.patch("dbupgrade.main.db_upgrade")
+class TestMain:
+    @pytest.fixture(autouse=True)
+    def logging(self, mocker: MockerFixture) -> Mock:
+        logging = mocker.patch("dbupgrade.main.logging")
+        logging.INFO = logging.INFO
+        logging.WARNING = logging.WARNING
+        return logging
 
-    @test
-    def default_logging(self) -> None:
-        self.args.quiet = False
-        main()
-        self.logging.basicConfig.assert_called_once_with(level=logging.INFO)
+    @pytest.fixture(autouse=True)
+    def parse_args(self, mocker: MockerFixture) -> Mock:
+        args = Arguments("myschema", "sqlite:///", "/tmp")
+        return mocker.patch("dbupgrade.main.parse_args", return_value=args)
 
-    @test
-    def quiet_mode(self) -> None:
-        self.args.quiet = True
+    @pytest.fixture(autouse=True)
+    def db_upgrade(self, mocker: MockerFixture) -> Mock:
+        return mocker.patch("dbupgrade.main.db_upgrade")
+
+    def test_default_logging(self, logging: Mock, parse_args: Mock) -> None:
+        parse_args.return_value.quiet = False
         main()
-        self.logging.basicConfig.assert_called_once_with(level=logging.WARNING)
+        logging.basicConfig.assert_called_once_with(level=logging.INFO)
+
+    def test_quiet_mode(self, logging: Mock, parse_args: Mock) -> None:
+        parse_args.return_value.quiet = True
+        main()
+        logging.basicConfig.assert_called_once_with(level=logging.WARNING)
