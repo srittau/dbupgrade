@@ -1,6 +1,40 @@
 [build-system]
-requires = ["setuptools >= 40.9", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "dbupgrade"
+version = "2.2.dev1"
+description = "Database Migration Tool"
+readme = "README.md"
+authors = ["Sebastian Rittau <srittau@rittau.biz>"]
+license = "MIT"
+homepage = "https://github.com/srittau/dbupgrade"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Database",
+    "Topic :: Software Development",
+]
+packages = [{ include = "dbupgrade" }]
+
+[tool.poetry.scripts]
+dbupgrade = 'dbupgrade.main:main'
+
+[tool.poetry.dependencies]
+python = ">=3.7,<4"     # <4 required for isort
+sqlalchemy = ">=1.4,<2"
+sqlparse = ">=0.3.0"
+
+[tool.poetry.dev-dependencies]
+asserts = ">=0.8.1,<0.12"
+black = "21.12b0"
+dectest = ">=1.0.0,<2"
+flake8 = "^4.0.1"
+isort = "^5.10.1"
+mypy = "0.930"
 
 [tool.black]
 line-length = 79
@@ -14,4 +48,4 @@ combine_as_imports = true
 line_length = 79
 known_dbupgrade = "dbupgrade"
 known_test = "test_dbupgrade"
-sections="FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER,DBUPGRADE,TEST"
+sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER,DBUPGRADE,TEST"
