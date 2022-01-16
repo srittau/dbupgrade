@@ -104,7 +104,7 @@ UPDATE foo SET bar = 99;
         assert not info.transaction
 
     def test_schema_missing(self) -> None:
-        with pytest.raises(ParseError, match="missing header: schema") as exc:
+        with pytest.raises(ParseError, match="missing header: schema"):
             parse_sql_stream(
                 StringIO(
                     """-- Dialect: sqlite
