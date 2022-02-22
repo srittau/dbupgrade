@@ -1,31 +1,25 @@
+from __future__ import annotations
+
 from argparse import ArgumentParser, Namespace
-from typing import Optional, Sequence
+from collections.abc import Sequence
+from dataclasses import dataclass
 
 
+@dataclass
 class Arguments:
-    def __init__(
-        self,
-        schema: str,
-        db_url: str,
-        script_path: str,
-        api_level: Optional[int] = None,
-        max_version: Optional[int] = None,
-        ignore_api_level: bool = False,
-        quiet: bool = False,
-    ) -> None:
-        if ignore_api_level and api_level is not None:
+    schema: str
+    db_url: str
+    script_path: str
+    api_level: int | None = None
+    max_version: int | None = None
+    ignore_api_level: bool = False
+    quiet: bool = False
+
+    def __post_init__(self) -> None:
+        if self.ignore_api_level and self.api_level is not None:
             raise ValueError(
                 "ignore_api_level and api_level are mutually exclusive"
             )
-        self.schema = schema
-        self.db_url = db_url
-        self.script_path = script_path
-        self.has_explicit_api_level = api_level is not None
-        self.api_level = api_level or 0
-        self.ignore_api_level = ignore_api_level
-        self.has_max_version = max_version is not None
-        self.max_version = max_version or 0
-        self.quiet = quiet
 
 
 def arguments_from_args(args: Namespace) -> Arguments:

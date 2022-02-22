@@ -19,10 +19,10 @@ class TestParseArgs:
         assert args.schema == "schema"
         assert args.db_url == "url"
         assert args.script_path == "dir"
+        assert args.api_level is None
+        assert args.max_version is None
         assert not args.quiet
-        assert not args.has_explicit_api_level
         assert not args.ignore_api_level
-        assert not args.has_max_version
 
     def test_small_q_option(self) -> None:
         args = parse_args(["script", "-q", "schema", "url", "dir"])
@@ -30,7 +30,6 @@ class TestParseArgs:
 
     def test_small_l_option(self) -> None:
         args = parse_args(["script", "-l", "44", "schema", "url", "dir"])
-        assert args.has_explicit_api_level
         assert not args.ignore_api_level
         assert args.api_level == 44
 
@@ -41,7 +40,7 @@ class TestParseArgs:
 
     def test_big_l_option(self) -> None:
         args = parse_args(["script", "-L", "schema", "url", "dir"])
-        assert not args.has_explicit_api_level
+        assert args.api_level is None
         assert args.ignore_api_level
 
     def test_big_and_small_l_option(self) -> None:
@@ -53,7 +52,6 @@ class TestParseArgs:
 
     def test_small_m_option(self) -> None:
         args = parse_args(["script", "-m", "10", "schema", "url", "dir"])
-        assert args.has_max_version
         assert args.max_version == 10
 
     def test_small_m_option__without_version(self) -> None:

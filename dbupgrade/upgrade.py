@@ -2,27 +2,37 @@ import logging
 from typing import List, Sequence
 
 from dbupgrade.apply import apply_files
-from dbupgrade.args import Arguments
 from dbupgrade.db import fetch_current_db_versions
 from dbupgrade.files import FileInfo, collect_sql_files
-from dbupgrade.filter import Filter, filter_from_arguments
+from dbupgrade.filter import Filter
 from dbupgrade.sql_file import parse_sql_files
+from dbupgrade.url import dialect_from_url
+from dbupgrade.version import VersionInfo, create_version_matcher
 
 
-def db_upgrade(args: Arguments) -> bool:
-    filter_ = create_filter(args)
-    files = read_files_to_apply(args.script_path, filter_)
-    return apply_files(args.db_url, files)
+def db_upgrade(
+    schema: str,
+    db_url: str,
+    script_path: str,
+    version_info: VersionInfo,
+) -> bool:
+    filter_ = create_filter(schema, db_url, version_info)
+    files = read_files_to_apply(script_path, filter_)
+    return apply_files(db_url, files)
 
 
-def create_filter(args: Arguments) -> Filter:
-    version, api_level = fetch_current_db_versions(args.db_url, args.schema)
+def create_filter(
+    schema: str, db_url: str, version_info: VersionInfo
+) -> Filter:
+    version, api_level = fetch_current_db_versions(db_url, schema)
     logging.info(
         "current version: {version}, current API level: {api_level}".format(
             version=version, api_level=api_level
         )
     )
-    return filter_from_arguments(args, version + 1, api_level)
+    matcher = create_version_matcher(version_info, version + 1, api_level)
+    dialect = dialect_from_url(db_url)
+    return Filter(schema, dialect, matcher)
 
 
 def read_files_to_apply(script_path: str, filter_: Filter) -> List[FileInfo]:

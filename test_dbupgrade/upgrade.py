@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 from unittest.mock import ANY, Mock, patch
 
 import pytest
 from pytest_mock import MockerFixture
 
-from dbupgrade.args import Arguments
 from dbupgrade.files import FileInfo
 from dbupgrade.upgrade import db_upgrade
+from dbupgrade.version import MAX_VERSION, VersionInfo, VersionMatcher
 
 
 class TestDBUpgrade:
@@ -38,17 +40,6 @@ class TestDBUpgrade:
     def apply_files(self, mocker: MockerFixture) -> Mock:
         return mocker.patch("dbupgrade.upgrade.apply_files")
 
-    def _create_arguments(
-        self,
-        *,
-        schema: str = "testschema",
-        db_url: str = "postgres://localhost/foo",
-        script_path: str = "/tmp"
-    ) -> Arguments:
-        return Arguments(
-            schema, db_url, script_path, None, None, ignore_api_level=True
-        )
-
     def test_exercise(
         self,
         fetch_current_db_versions: Mock,
@@ -58,15 +49,12 @@ class TestDBUpgrade:
     ) -> None:
         filenames = ["/tmp/foo", "/tmp/bar"]
         file_infos = [FileInfo("", "myschema", "postgres", 150, 30)]
-        args = self._create_arguments(
-            schema="myschema",
-            db_url="postgres://localhost/foo",
-            script_path="/tmp",
-        )
         fetch_current_db_versions.return_value = 123, 44
         collect_sql_files.return_value = filenames
         parse_sql_files.return_value = file_infos
-        db_upgrade(args)
+        db_upgrade(
+            "myschema", "postgres://localhost/foo", "/tmp", VersionInfo()
+        )
         fetch_current_db_versions.assert_called_once_with(
             "postgres://localhost/foo", "myschema"
         )
@@ -82,34 +70,45 @@ class TestDBUpgrade:
         parse_sql_files: Mock,
         apply_files: Mock,
     ) -> None:
-        args = self._create_arguments()
         fetch_current_db_versions.return_value = 130, 34
         file_info = FileInfo("", "myschema", "", 0, 0)
         parse_sql_files.return_value = [
             file_info,
             FileInfo("", "otherschema", "", 0, 0),
         ]
-        with patch("dbupgrade.upgrade.filter_from_arguments") as ffa:
-            ffa.return_value.matches = lambda fi: fi.schema == "myschema"
-            db_upgrade(args)
-            ffa.assert_called_once_with(args, 131, 34)
+        with patch("dbupgrade.upgrade.Filter") as filter_:
+            filter_.return_value.matches = lambda fi: fi.schema == "myschema"
+            db_upgrade(
+                "myschema",
+                "postgres://localhost/foo",
+                "/tmp",
+                VersionInfo(api_level=12),
+            )
+            filter_.assert_called_once_with(
+                "myschema", "postgres", VersionMatcher(131, MAX_VERSION, 12)
+            )
             apply_files.assert_called_once_with(ANY, [file_info])
 
     def test_order(self, parse_sql_files: Mock, apply_files: Mock) -> None:
-        args = self._create_arguments()
         fi123 = FileInfo("", "myschema", "postgres", 123, 0)
         fi122 = FileInfo("", "myschema", "postgres", 122, 0)
         fi124 = FileInfo("", "myschema", "postgres", 124, 0)
         parse_sql_files.return_value = [fi123, fi122, fi124]
-        with patch("dbupgrade.upgrade.filter_from_arguments") as ffa:
-            ffa.return_value.matches.return_value = True
-            db_upgrade(args)
+        with patch("dbupgrade.upgrade.Filter") as filter_:
+            filter_.return_value.return_value.matches.return_value = True
+            db_upgrade(
+                "myschema",
+                "postgres://localhost/foo",
+                "/tmp",
+                VersionInfo(),
+            )
             apply_files.assert_called_once_with(ANY, [fi122, fi123, fi124])
 
     def test_log(self, logging: Mock, fetch_current_db_versions: Mock) -> None:
-        args = self._create_arguments()
         fetch_current_db_versions.return_value = 123, 44
-        db_upgrade(args)
+        db_upgrade(
+            "myschema", "postgres://localhost/foo", "/tmp", VersionInfo()
+        )
         logging.info.assert_called_once_with(
             "current version: 123, current API level: 44"
         )
