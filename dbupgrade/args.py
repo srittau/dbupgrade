@@ -14,6 +14,7 @@ class Arguments:
     max_version: int | None = None
     ignore_api_level: bool = False
     quiet: bool = False
+    json: bool = False
 
     def __post_init__(self) -> None:
         if self.ignore_api_level and self.api_level is not None:
@@ -31,6 +32,7 @@ def arguments_from_args(args: Namespace) -> Arguments:
         args.max_version,
         args.ignore_api_level,
         args.quiet,
+        args.json,
     )
 
 
@@ -48,6 +50,11 @@ def parse_args(argv: Sequence[str]) -> Arguments:
         "--quiet",
         action="store_true",
         help="suppress informational output",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="print upgrade information as JSON, implies -q",
     )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(

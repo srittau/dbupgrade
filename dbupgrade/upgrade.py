@@ -1,13 +1,16 @@
+from __future__ import annotations
+
 import logging
 from typing import List, Sequence
 
-from dbupgrade.apply import apply_files
-from dbupgrade.db import fetch_current_db_versions
-from dbupgrade.files import FileInfo, collect_sql_files
-from dbupgrade.filter import Filter
-from dbupgrade.sql_file import parse_sql_files
-from dbupgrade.url import dialect_from_url
-from dbupgrade.version import VersionInfo, create_version_matcher
+from .apply import apply_files
+from .db import fetch_current_db_versions
+from .files import FileInfo, collect_sql_files
+from .filter import Filter
+from .result import UpgradeResult, VersionResult
+from .sql_file import parse_sql_files
+from .url import dialect_from_url
+from .version import VersionInfo, create_version_matcher
 
 
 def db_upgrade(
@@ -15,15 +18,29 @@ def db_upgrade(
     db_url: str,
     script_path: str,
     version_info: VersionInfo,
-) -> bool:
-    filter_ = create_filter(schema, db_url, version_info)
+) -> UpgradeResult:
+    old_version, old_api_level, filter_ = create_filter(
+        schema, db_url, version_info
+    )
     files = read_files_to_apply(script_path, filter_)
-    return apply_files(db_url, files)
+    applied_scripts, failed_script = apply_files(db_url, files)
+    try:
+        new_version = applied_scripts[-1].version
+        new_api_level = applied_scripts[-1].api_level
+    except IndexError:
+        new_version = old_version
+        new_api_level = old_api_level
+    return UpgradeResult(
+        VersionResult(old_version, old_api_level),
+        VersionResult(new_version, new_api_level),
+        applied_scripts,
+        failed_script,
+    )
 
 
 def create_filter(
     schema: str, db_url: str, version_info: VersionInfo
-) -> Filter:
+) -> tuple[int, int, Filter]:
     version, api_level = fetch_current_db_versions(db_url, schema)
     logging.info(
         "current version: {version}, current API level: {api_level}".format(
@@ -32,7 +49,7 @@ def create_filter(
     )
     matcher = create_version_matcher(version_info, version + 1, api_level)
     dialect = dialect_from_url(db_url)
-    return Filter(schema, dialect, matcher)
+    return version, api_level, Filter(schema, dialect, matcher)
 
 
 def read_files_to_apply(script_path: str, filter_: Filter) -> List[FileInfo]:

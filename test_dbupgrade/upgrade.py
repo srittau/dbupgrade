@@ -6,6 +6,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from dbupgrade.files import FileInfo
+from dbupgrade.result import UpgradeResult, VersionResult
 from dbupgrade.upgrade import db_upgrade
 from dbupgrade.version import MAX_VERSION, VersionInfo, VersionMatcher
 
@@ -38,7 +39,9 @@ class TestDBUpgrade:
 
     @pytest.fixture(autouse=True)
     def apply_files(self, mocker: MockerFixture) -> Mock:
-        return mocker.patch("dbupgrade.upgrade.apply_files")
+        return mocker.patch(
+            "dbupgrade.upgrade.apply_files", return_value=([], None)
+        )
 
     def test_exercise(
         self,
@@ -111,4 +114,59 @@ class TestDBUpgrade:
         )
         logging.info.assert_called_once_with(
             "current version: 123, current API level: 44"
+        )
+
+    def test_result_no_files(
+        self, fetch_current_db_versions: Mock, apply_files: Mock
+    ) -> None:
+        fetch_current_db_versions.return_value = (122, 44)
+        apply_files.return_value = ([], None)
+        result = db_upgrade(
+            "myschema",
+            "postgres://localhost/foo",
+            "/tmp",
+            VersionInfo(),
+        )
+        assert result == UpgradeResult(
+            VersionResult(122, 44), VersionResult(122, 44), [], None
+        )
+
+    def test_result_success(
+        self, fetch_current_db_versions: Mock, apply_files: Mock
+    ) -> None:
+        file_info1 = FileInfo("foo.sql", "myschema", "", 123, 45)
+        file_info2 = FileInfo("foo.sql", "myschema", "", 124, 46)
+        fetch_current_db_versions.return_value = (122, 44)
+        apply_files.return_value = ([file_info1, file_info2], None)
+        result = db_upgrade(
+            "myschema",
+            "postgres://localhost/foo",
+            "/tmp",
+            VersionInfo(),
+        )
+        assert result == UpgradeResult(
+            VersionResult(122, 44),
+            VersionResult(124, 46),
+            [file_info1, file_info2],
+            None,
+        )
+
+    def test_result_error(
+        self, fetch_current_db_versions: Mock, apply_files: Mock
+    ) -> None:
+        file_info1 = FileInfo("foo.sql", "myschema", "", 123, 45)
+        file_info2 = FileInfo("foo.sql", "myschema", "", 124, 46)
+        fetch_current_db_versions.return_value = (122, 44)
+        apply_files.return_value = ([file_info1], file_info2)
+        result = db_upgrade(
+            "myschema",
+            "postgres://localhost/foo",
+            "/tmp",
+            VersionInfo(),
+        )
+        assert result == UpgradeResult(
+            VersionResult(122, 44),
+            VersionResult(123, 45),
+            [file_info1],
+            file_info2,
         )

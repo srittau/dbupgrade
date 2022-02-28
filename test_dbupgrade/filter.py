@@ -8,7 +8,7 @@ class TestFilter:
         filter_ = Filter("myschema", "postgres", VersionMatcher(5, 10, 3))
         assert filter_.schema == "myschema"
         assert filter_.dialect == "postgres"
-        assert filter_.version_info == VersionMatcher(5, 10, 3)
+        assert filter_.version_matcher == VersionMatcher(5, 10, 3)
 
     def test_matches__version_matches_lower(self) -> None:
         filter_ = Filter("myschema", "postgres", VersionMatcher(5, 10, 3))
