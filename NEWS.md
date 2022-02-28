@@ -1,3 +1,5 @@
+# News in dbupgrade 2.3.1
+
 # News in dbupgrade 2.3.0
 
 - Add a `--json` option to print update information in JSON format.

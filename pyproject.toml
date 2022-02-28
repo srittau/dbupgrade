@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "dbupgrade"
-version = "2.3.0"
+version = "2.3.dev1"
 description = "Database Migration Tool"
 readme = "README.md"
 authors = ["Sebastian Rittau <srittau@rittau.biz>"]
