@@ -30,9 +30,7 @@ sqlalchemy = "^1.4"
 sqlparse = ">=0.3.0"
 
 [tool.poetry.dev-dependencies]
-asserts = ">=0.8.1,<0.12"
 black = "^22.6.0"
-dectest = "^1.0.0"
 flake8 = "^5.0.1"
 isort = "^5.10.1"
 mypy = "0.971"
