@@ -24,6 +24,11 @@ packages = [{ include = "dbupgrade" }]
 [tool.poetry.scripts]
 dbupgrade = 'dbupgrade.main:main'
 
+[tool.poetry.urls]
+"GitHub" = "https://github.com/srittau/dbupgrade"
+"Bug Tracker" = "https://github.com/srittau/dbupgrade/issues"
+"Changes" = "https://github.com/srittau/dbupgrade/blob/main/NEWS.md"
+
 [tool.poetry.dependencies]
 python = "^3.7"
 sqlalchemy = "^1.4"
