@@ -1,4 +1,5 @@
 import json
+import logging
 from unittest.mock import Mock
 
 import pytest
@@ -16,10 +17,10 @@ vi = VersionResult(0, 0)
 class TestMain:
     @pytest.fixture(autouse=True)
     def logging(self, mocker: MockerFixture) -> Mock:
-        logging = mocker.patch("dbupgrade.main.logging")
-        logging.INFO = logging.INFO
-        logging.WARNING = logging.WARNING
-        return logging
+        logging_mock = mocker.patch("dbupgrade.main.logging")
+        logging_mock.INFO = logging.INFO
+        logging_mock.WARNING = logging.WARNING
+        return logging_mock
 
     @pytest.fixture(autouse=True)
     def parse_args(self, mocker: MockerFixture) -> Mock:
