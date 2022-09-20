@@ -1,23 +1,77 @@
+from __future__ import annotations
+
+import sqlite3
+from collections.abc import Generator
+from tempfile import NamedTemporaryFile
 from typing import Any, Sequence, cast
 from unittest.mock import MagicMock, Mock, call
 
 import pytest
 from pytest_mock import MockerFixture
-from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql.elements import TextClause
 
 from dbupgrade.db import (
     SQL_CREATE_DB_CONFIG,
-    SQL_INSERT_DEFAULT_VERSIONS,
-    SQL_SELECT_VERSIONS,
     SQL_UPDATE_VERSIONS,
     fetch_current_db_versions,
     update_sql,
 )
 
 
+class DBFixtureContext:
+    def __init__(self, db_path: str) -> None:
+        self.db_path = db_path
+        self._connection: sqlite3.Connection | None = None
+
+    def __enter__(self) -> sqlite3.Cursor:
+        self._connection = sqlite3.connect(self.db_path)
+        self._connection.__enter__()
+        return self._connection.cursor()
+
+    def __exit__(self, *args: Any) -> None:
+        assert self._connection
+        self._connection.__exit__(*args)
+
+
+class DBFixture:
+    def __init__(self, db_path: str) -> None:
+        self.db_path = db_path
+
+    @property
+    def url(self) -> str:
+        return f"sqlite:///{self.db_path}"
+
+    def connect(self) -> DBFixtureContext:
+        return DBFixtureContext(self.db_path)
+
+    def create_table(self) -> None:
+        with self.connect() as cursor:
+            cursor.execute(SQL_CREATE_DB_CONFIG.format(quote='"'))
+
+    def insert_row(self, schema: str, version: int, api_level: int) -> None:
+        with self.connect() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO db_config("schema", version, api_level)
+                VALUES(?, ?, ?)
+                """,
+                [schema, version, api_level],
+            )
+
+    def fetch_rows(self) -> list[tuple[str, int, int]]:
+        with self.connect() as cursor:
+            cursor.execute("SELECT * FROM db_config")
+            return cursor.fetchall()
+
+
+@pytest.fixture
+def test_db() -> Generator[DBFixture, None, None]:
+    with NamedTemporaryFile(prefix="test-", suffix=".sqlite") as f:
+        yield DBFixture(f.name)
+
+
 class TestFetchCurrentDBVersions:
-    @pytest.fixture(autouse=True)
+    @pytest.fixture
     def create_engine(self, mocker: MockerFixture) -> Mock:
         engine = MagicMock()
         engine.dialect.name = "sqlite"
@@ -53,97 +107,40 @@ class TestFetchCurrentDBVersions:
             fetch_current_db_versions("sqlite:///", "myschema")
         create_engine.return_value.dispose.assert_called_once_with()
 
-    def test_table_does_not_exist(self, create_engine: Mock) -> None:
-        create_sql = SQL_CREATE_DB_CONFIG.format(quote='"')
-        select_versions = SQL_SELECT_VERSIONS.format(quote='"')
-        insert_versions = SQL_INSERT_DEFAULT_VERSIONS.format(quote='"')
-
-        def execute(sql: TextClause, **_: Any) -> Mock:
-            real_sql = str(sql)
-            if real_sql == create_sql:
-                raise OperationalError(None, None, None)
-            elif real_sql == select_versions:
-                m = Mock()
-                m.fetchall.return_value = []
-                return m
-            elif real_sql == insert_versions:
-                return Mock()
-            else:
-                raise AssertionError("unexpected SQL '{}'".format(sql))
-
-        create_engine.return_value.execute.side_effect = execute
-        version, api_level = fetch_current_db_versions(
-            "sqlite:///", "myschema"
-        )
+    def test_table_does_not_exist__return_value(
+        self, test_db: DBFixture
+    ) -> None:
+        version, api_level = fetch_current_db_versions(test_db.url, "myschema")
         assert version == -1
         assert api_level == 0
-        self._assert_execute_has_calls(
-            create_engine,
-            [
-                call(create_sql),
-                call(select_versions, col="myschema"),
-                call(insert_versions, schema="myschema"),
-            ],
-        )
 
-    def test_table_has_no_row_for_schema(self, create_engine: Mock) -> None:
-        create_sql = SQL_CREATE_DB_CONFIG.format(quote='"')
-        select_versions = SQL_SELECT_VERSIONS.format(quote='"')
-        insert_versions = SQL_INSERT_DEFAULT_VERSIONS.format(quote='"')
+    def test_table_does_not_exist__created(self, test_db: DBFixture) -> None:
+        fetch_current_db_versions(test_db.url, "myschema")
+        rows = test_db.fetch_rows()
+        assert rows == [("myschema", -1, 0)]
 
-        def execute(sql: TextClause, **_: Any) -> Mock:
-            real_sql = str(sql)
-            if real_sql == create_sql:
-                return Mock()
-            elif real_sql == select_versions:
-                m = Mock()
-                m.fetchall.return_value = []
-                return m
-            elif real_sql == insert_versions:
-                return Mock()
-            else:
-                raise AssertionError("unexpected SQL '{}'".format(sql))
-
-        create_engine.return_value.execute.side_effect = execute
-        version, api_level = fetch_current_db_versions(
-            "sqlite:///", "myschema"
-        )
+    def test_table_has_no_row_for_schema__return_value(
+        self, test_db: DBFixture
+    ) -> None:
+        test_db.create_table()
+        version, api_level = fetch_current_db_versions(test_db.url, "myschema")
         assert version == -1
         assert api_level == 0
-        self._assert_execute_has_calls(
-            create_engine,
-            [
-                call(create_sql),
-                call(select_versions, col="myschema"),
-                call(insert_versions, schema="myschema"),
-            ],
-        )
 
-    def test_table_has_row(self, create_engine: Mock) -> None:
-        create_sql = SQL_CREATE_DB_CONFIG.format(quote='"')
-        select_versions = SQL_SELECT_VERSIONS.format(quote='"')
+    def test_table_has_no_row_for_schema__inserted(
+        self, test_db: DBFixture
+    ) -> None:
+        test_db.create_table()
+        fetch_current_db_versions(test_db.url, "myschema")
+        rows = test_db.fetch_rows()
+        assert rows == [("myschema", -1, 0)]
 
-        def execute(sql: TextClause, **_: Any) -> Mock:
-            real_sql = str(sql)
-            if real_sql == create_sql:
-                return Mock()
-            elif real_sql == select_versions:
-                m = Mock()
-                m.fetchall.return_value = [(123, 34)]
-                return m
-            else:
-                raise AssertionError("unexpected SQL '{}'".format(sql))
-
-        create_engine.return_value.execute.side_effect = execute
-        version, api_level = fetch_current_db_versions(
-            "sqlite:///", "myschema"
-        )
+    def test_table_has_row__return_value(self, test_db: DBFixture) -> None:
+        test_db.create_table()
+        test_db.insert_row("myschema", 123, 34)
+        version, api_level = fetch_current_db_versions(test_db.url, "myschema")
         assert version == 123
         assert api_level == 34
-        self._assert_execute_has_calls(
-            create_engine,
-            [call(create_sql), call(select_versions, col="myschema")],
-        )
 
     def test_mysql_quote_char(self, create_engine: Mock) -> None:
         create_engine.return_value.dialect.name = "mysql+foo"
@@ -153,7 +150,7 @@ class TestFetchCurrentDBVersions:
 
 
 class TestUpdateSQL:
-    @pytest.fixture(autouse=True)
+    @pytest.fixture
     def create_engine(self, mocker: MockerFixture) -> Mock:
         engine = MagicMock()
         engine.dialect.name = "sqlite"
