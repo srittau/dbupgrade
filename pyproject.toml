@@ -10,6 +10,7 @@ readme = "README.md"
 authors = ["Sebastian Rittau <srittau@rittau.biz>"]
 license = "MIT"
 homepage = "https://github.com/srittau/dbupgrade"
+repository = "https://github.com/srittau/dbupgrade"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
