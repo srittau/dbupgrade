@@ -1,4 +1,6 @@
-from typing import Any, List, Optional, Tuple
+from __future__ import annotations
+
+from typing import Any, Optional, Tuple
 
 from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Connection, Engine
@@ -37,7 +39,8 @@ def _quote_char(engine: Engine) -> str:
 
 def _execute_sql_ignore_errors(engine: Engine, query: str) -> None:
     try:
-        engine.execute(sa_text(query))
+        with engine.begin() as connection:
+            connection.execute(sa_text(query))
     except SQLAlchemyError:
         pass
 
@@ -49,7 +52,7 @@ class _EngineContext:
         self._engine: Optional[Engine] = None
 
     def __enter__(self) -> Engine:
-        self._engine = create_engine(self._db_url, **self._kwargs)
+        self._engine = create_engine(self._db_url, future=True, **self._kwargs)
         return self._engine
 
     def __exit__(self, _: Any, __: Any, ___: Any) -> None:
@@ -98,15 +101,17 @@ def _try_fetching_version_info_for_schema(
 ) -> Optional[Tuple[int, int]]:
     sql = SQL_SELECT_VERSIONS.format(quote=_quote_char(engine))
     query = sa_text(sql)
-    result = engine.execute(query, col=schema)
-    rows = result.fetchall()  # type: List[Tuple[int, int]]
+    with engine.begin() as connection:
+        result = connection.execute(query, {"col": schema})
+        rows: list[tuple[int, int]] = result.fetchall()
     return rows[0] if len(rows) == 1 else None
 
 
 def _insert_default_version_info(engine: Engine, schema: str) -> None:
     quote_char = _quote_char(engine)
     query = sa_text(SQL_INSERT_DEFAULT_VERSIONS.format(quote=quote_char))
-    engine.execute(query, schema=schema)
+    with engine.begin() as connection:
+        connection.execute(query, {"schema": schema})
 
 
 def update_sql(
@@ -116,7 +121,7 @@ def update_sql(
     version: int,
     api_level: int,
     *,
-    transaction: bool = True
+    transaction: bool = True,
 ) -> None:
     kwargs = {} if transaction else {"isolation_level": "AUTOCOMMIT"}
     with _EngineContext(db_url, **kwargs) as engine:

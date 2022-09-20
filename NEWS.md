@@ -1,5 +1,7 @@
 # News in dbupgrade 2.3.1
 
+- Improve forwards compatibility with SQLAlchemy 2.
+
 # News in dbupgrade 2.3.0
 
 - Add a `--json` option to print update information in JSON format.

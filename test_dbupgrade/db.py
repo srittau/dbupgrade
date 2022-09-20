@@ -82,30 +82,12 @@ class TestFetchCurrentDBVersions:
         create_engine: Mock,
         expected_query: str,
     ) -> None:
-        execute = create_engine.return_value.execute
+        execute = (
+            create_engine.return_value.begin.return_value.__enter__.return_value.execute
+        )
         assert any(
             str(c[0][0]) == expected_query for c in execute.call_args_list
         )
-
-    def _assert_execute_has_calls(
-        self, create_engine: Mock, expected_queries: Sequence[Any]
-    ) -> None:
-        execute = create_engine.return_value.execute
-        assert len(execute.call_args_list) == len(expected_queries)
-        for c, ca in zip(expected_queries, execute.call_args_list):
-            cac = call(str(ca[0][0]), **ca[1])
-            assert cac == c
-
-    def test_create_engine_called(self, create_engine: Mock) -> None:
-        fetch_current_db_versions("sqlite:///", "myschema")
-        create_engine.assert_called_once_with("sqlite:///")
-        create_engine.return_value.dispose.assert_called_once_with()
-
-    def test_dispose_engine_on_error(self, create_engine: Mock) -> None:
-        create_engine.return_value.execute.side_effect = ValueError()
-        with pytest.raises(ValueError):
-            fetch_current_db_versions("sqlite:///", "myschema")
-        create_engine.return_value.dispose.assert_called_once_with()
 
     def test_table_does_not_exist__return_value(
         self, test_db: DBFixture
@@ -183,7 +165,7 @@ class TestUpdateSQL:
     ) -> None:
         sql = "SELECT * FROM foo"
         update_sql("sqlite:///", sql, "myschema", 0, 0)
-        create_engine.assert_called_once_with("sqlite:///")
+        create_engine.assert_called_once_with("sqlite:///", future=True)
         engine.dispose.assert_called_once_with()
 
     def test_dispose_engine_on_error(
@@ -200,7 +182,7 @@ class TestUpdateSQL:
     ) -> None:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         update_sql("sqlite:///", sql, "myschema", 44, 13, transaction=True)
-        create_engine.assert_called_once_with("sqlite:///")
+        create_engine.assert_called_once_with("sqlite:///", future=True)
         sql2 = SQL_UPDATE_VERSIONS.format(quote='"')
         self._assert_execute_has_calls(
             connection.execute,
@@ -218,7 +200,7 @@ class TestUpdateSQL:
         sql = "SELECT * FROM foo; SELECT * FROM bar;"
         update_sql("sqlite:///", sql, "myschema", 44, 13, transaction=False)
         create_engine.assert_called_once_with(
-            "sqlite:///", isolation_level="AUTOCOMMIT"
+            "sqlite:///", future=True, isolation_level="AUTOCOMMIT"
         )
 
     def test_escape_percent_signs__paramstyle_pyformat(
