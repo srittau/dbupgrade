@@ -29,4 +29,6 @@ jobs:
           poetry run mypy --version
           poetry run mypy dbupgrade test_dbupgrade
       - name: Test with pytest
+        env:
+          SQLALCHEMY_WARN_20: true
         run: poetry run pytest
