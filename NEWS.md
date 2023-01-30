@@ -1,4 +1,4 @@
-# Unreleased Changes
+# News in dbupgrade 2.3.2
 
 - Make compatible with SQLAlchemy 2.
 
