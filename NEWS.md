@@ -1,5 +1,7 @@
 # Unreleased Changes
 
+- Don't escape percent characters when using SQLAlchemy 2.
+
 # News in dbupgrade 2.3.2
 
 - Make compatible with SQLAlchemy 2.

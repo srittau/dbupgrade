@@ -7,6 +7,7 @@ from typing import Any, Sequence, cast
 from unittest.mock import MagicMock, Mock, _Call, call
 
 import pytest
+import sqlalchemy
 from pytest_mock import MockerFixture
 from sqlalchemy.sql.elements import TextClause
 
@@ -219,6 +220,24 @@ class TestUpdateSQL:
             "sqlite:///", future=True, isolation_level="AUTOCOMMIT"
         )
 
+    def test_colon(
+        self,
+        create_engine: Mock,
+        connection: Mock,
+    ) -> None:
+        self._set_paramstyle(create_engine, "pyformat")
+        update_sql("sqlite:///", "SELECT ':foo'", "myschema", 44, 13)
+        self._assert_execute_has_calls(
+            connection.execute,
+            [
+                call("SELECT ':foo'"),
+                call(
+                    SQL_UPDATE_VERSIONS.format(quote='"'),
+                    {"schema": "myschema", "version": 44, "api_level": 13},
+                ),
+            ],
+        )
+
     def test_escape_percent_signs__paramstyle_pyformat(
         self,
         create_engine: Mock,
@@ -229,7 +248,11 @@ class TestUpdateSQL:
         self._assert_execute_has_calls(
             connection.execute,
             [
-                call("SELECT 1 %% 2"),
+                call(
+                    "SELECT 1 %% 2"
+                    if sqlalchemy.__version__ < "2.0.0"
+                    else "SELECT 1 % 2"
+                ),
                 call(
                     SQL_UPDATE_VERSIONS.format(quote='"'),
                     {"schema": "myschema", "version": 44, "api_level": 13},

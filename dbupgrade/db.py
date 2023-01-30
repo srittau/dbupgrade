@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
+import sqlalchemy
 from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import SQLAlchemyError
@@ -66,6 +67,8 @@ class _EngineContext:
 
 
 def _should_escape_percents(connection: Connection) -> bool:
+    if sqlalchemy.__version__ >= "2.0.0":
+        return False
     return connection.engine.dialect.paramstyle in ["format", "pyformat"]
 
 
