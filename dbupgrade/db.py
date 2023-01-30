@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Row, create_engine, text as sa_text
+from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import SQLAlchemyError
 
 from dbupgrade.sql import split_sql
+
+if TYPE_CHECKING:
+    from sqlalchemy import Row
 
 SQL_CREATE_DB_CONFIG = """
     CREATE TABLE db_config(
