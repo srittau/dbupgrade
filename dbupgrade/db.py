@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional, Tuple
+from typing import Any
 
 from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Connection, Engine
@@ -49,7 +49,7 @@ class _EngineContext:
     def __init__(self, db_url: str, **kwargs: Any) -> None:
         self._db_url = db_url
         self._kwargs = kwargs
-        self._engine: Optional[Engine] = None
+        self._engine: Engine | None = None
 
     def __enter__(self) -> Engine:
         self._engine = create_engine(self._db_url, future=True, **self._kwargs)
@@ -65,7 +65,7 @@ def _should_escape_percents(connection: Connection) -> bool:
     return connection.engine.dialect.paramstyle in ["format", "pyformat"]
 
 
-def fetch_current_db_versions(db_url: str, schema: str) -> Tuple[int, int]:
+def fetch_current_db_versions(db_url: str, schema: str) -> tuple[int, int]:
     """Return the current version and API level of the database for the
     given schema.
 
@@ -80,7 +80,7 @@ def fetch_current_db_versions(db_url: str, schema: str) -> Tuple[int, int]:
 
 def _fetch_or_create_version_info(
     engine: Engine, schema: str
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     _try_creating_db_config_table(engine)
     versions = _try_fetching_version_info_for_schema(engine, schema)
     if versions:
@@ -98,7 +98,7 @@ def _try_creating_db_config_table(engine: Engine) -> None:
 
 def _try_fetching_version_info_for_schema(
     engine: Engine, schema: str
-) -> Optional[Tuple[int, int]]:
+) -> tuple[int, int] | None:
     sql = SQL_SELECT_VERSIONS.format(quote=_quote_char(engine))
     query = sa_text(sql)
     with engine.begin() as connection:
