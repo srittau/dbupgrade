@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import create_engine, text as sa_text
+from sqlalchemy import Row, create_engine, text as sa_text
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -103,8 +104,8 @@ def _try_fetching_version_info_for_schema(
     query = sa_text(sql)
     with engine.begin() as connection:
         result = connection.execute(query, {"col": schema})
-        rows: list[tuple[int, int]] = result.fetchall()
-    return rows[0] if len(rows) == 1 else None
+        rows: Sequence[Row[tuple[int, int]]] = result.fetchall()
+    return (rows[0][0], rows[0][1]) if len(rows) == 1 else None
 
 
 def _insert_default_version_info(engine: Engine, schema: str) -> None:
@@ -143,11 +144,13 @@ def _execute_sql_stream(conn: Connection, sql: str) -> None:
             escaped_query = query.replace("%", "%%")
         else:
             escaped_query = query
-        conn.execute(escaped_query)
+        conn.execute(sa_text(escaped_query))
 
 
 def _update_versions(
     conn: Connection, schema: str, version: int, api_level: int
 ) -> None:
     query = sa_text(SQL_UPDATE_VERSIONS.format(quote=_quote_char(conn.engine)))
-    conn.execute(query, schema=schema, version=version, api_level=api_level)
+    conn.execute(
+        query, {"schema": schema, "version": version, "api_level": api_level}
+    )

@@ -4,7 +4,7 @@ import sqlite3
 from collections.abc import Generator
 from tempfile import NamedTemporaryFile
 from typing import Any, Sequence, cast
-from unittest.mock import MagicMock, Mock, call
+from unittest.mock import MagicMock, Mock, _Call, call
 
 import pytest
 from pytest_mock import MockerFixture
@@ -153,18 +153,21 @@ class TestUpdateSQL:
         create_engine.return_value.dialect.paramstyle = paramstyle
 
     def _assert_execute_has_calls(
-        self, execute_mock: Mock, expected_queries: Sequence[Any]
+        self, execute_mock: Mock, expected_queries: Sequence[_Call]
     ) -> None:
         assert len(execute_mock.call_args_list) == len(expected_queries)
-        for c, ca in zip(expected_queries, execute_mock.call_args_list):
-            cac = call(str(ca[0][0]), **ca[1])
-            assert cac == c
+        for expected_call, true_call in zip(
+            expected_queries, execute_mock.call_args_list
+        ):
+            assert len(true_call) == 2, f"unexpected call: {true_call!r}"
+            query = str(true_call[0][0])
+            true_call2 = call(query, *true_call[0][1:], **true_call[1])
+            assert true_call2 == expected_call
 
     def test_create_engine_called(
         self, create_engine: Mock, engine: Mock
     ) -> None:
-        sql = "SELECT * FROM foo"
-        update_sql("sqlite:///", sql, "myschema", 0, 0)
+        update_sql("sqlite:///", "SELECT * FROM foo", "myschema", 0, 0)
         create_engine.assert_called_once_with("sqlite:///", future=True)
         engine.dispose.assert_called_once_with()
 
@@ -173,23 +176,30 @@ class TestUpdateSQL:
     ) -> None:
         connection.execute.side_effect = ValueError()
         with pytest.raises(ValueError):
-            sql = "SELECT * FROM foo"
-            update_sql("sqlite:///", sql, "myschema", 44, 13)
+            update_sql("sqlite:///", "SELECT * FROM foo", "myschema", 44, 13)
         engine.dispose.assert_called_once_with()
 
     def test_execute_with_transaction(
         self, create_engine: Mock, connection: Mock
     ) -> None:
-        sql = "SELECT * FROM foo; SELECT * FROM bar;"
-        update_sql("sqlite:///", sql, "myschema", 44, 13, transaction=True)
+        update_sql(
+            "sqlite:///",
+            "SELECT * FROM foo; SELECT * FROM bar;",
+            "myschema",
+            44,
+            13,
+            transaction=True,
+        )
         create_engine.assert_called_once_with("sqlite:///", future=True)
-        sql2 = SQL_UPDATE_VERSIONS.format(quote='"')
         self._assert_execute_has_calls(
             connection.execute,
             [
                 call("SELECT * FROM foo"),
                 call("SELECT * FROM bar"),
-                call(sql2, schema="myschema", version=44, api_level=13),
+                call(
+                    SQL_UPDATE_VERSIONS.format(quote='"'),
+                    {"schema": "myschema", "version": 44, "api_level": 13},
+                ),
             ],
         )
         assert isinstance(
@@ -197,8 +207,14 @@ class TestUpdateSQL:
         )
 
     def test_execute_without_transaction(self, create_engine: Mock) -> None:
-        sql = "SELECT * FROM foo; SELECT * FROM bar;"
-        update_sql("sqlite:///", sql, "myschema", 44, 13, transaction=False)
+        update_sql(
+            "sqlite:///",
+            "SELECT * FROM foo; SELECT * FROM bar;",
+            "myschema",
+            44,
+            13,
+            transaction=False,
+        )
         create_engine.assert_called_once_with(
             "sqlite:///", future=True, isolation_level="AUTOCOMMIT"
         )
@@ -209,14 +225,15 @@ class TestUpdateSQL:
         connection: Mock,
     ) -> None:
         self._set_paramstyle(create_engine, "pyformat")
-        sql = "SELECT 1 % 2"
-        update_sql("sqlite:///", sql, "myschema", 44, 13)
-        sql2 = SQL_UPDATE_VERSIONS.format(quote='"')
+        update_sql("sqlite:///", "SELECT 1 % 2", "myschema", 44, 13)
         self._assert_execute_has_calls(
             connection.execute,
             [
                 call("SELECT 1 %% 2"),
-                call(sql2, schema="myschema", version=44, api_level=13),
+                call(
+                    SQL_UPDATE_VERSIONS.format(quote='"'),
+                    {"schema": "myschema", "version": 44, "api_level": 13},
+                ),
             ],
         )
 
@@ -226,13 +243,14 @@ class TestUpdateSQL:
         connection: Mock,
     ) -> None:
         self._set_paramstyle(create_engine, "qmark")
-        sql = "SELECT 1 % 2"
-        update_sql("sqlite:///", sql, "myschema", 44, 13)
-        sql2 = SQL_UPDATE_VERSIONS.format(quote='"')
+        update_sql("sqlite:///", "SELECT 1 % 2", "myschema", 44, 13)
         self._assert_execute_has_calls(
             connection.execute,
             [
                 call("SELECT 1 % 2"),
-                call(sql2, schema="myschema", version=44, api_level=13),
+                call(
+                    SQL_UPDATE_VERSIONS.format(quote='"'),
+                    {"schema": "myschema", "version": 44, "api_level": 13},
+                ),
             ],
         )

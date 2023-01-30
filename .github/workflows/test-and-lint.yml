@@ -3,7 +3,8 @@ name: Test and lint
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
+    name: Test against SQLAlchemy 2
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -29,6 +30,29 @@ jobs:
         run: |
           poetry run mypy --version
           poetry run mypy dbupgrade test_dbupgrade
+      - name: Test with pytest
+        run: poetry run pytest
+
+  test14:
+    name: Test against SQLAlchemy 1.4
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install poetry
+        run: pip --disable-pip-version-check install -U poetry
+      - name: Install Python packages
+        run: |
+          poetry install
+          poetry add SQLAlchemy==^1.4
       - name: Test with pytest
         env:
           SQLALCHEMY_WARN_20: true

@@ -1,3 +1,7 @@
+# Unreleased Changes
+
+- Make compatible with SQLAlchemy 2.
+
 # News in dbupgrade 2.3.1
 
 - Improve forwards compatibility with SQLAlchemy 2.
