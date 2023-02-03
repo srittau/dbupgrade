@@ -66,12 +66,6 @@ class _EngineContext:
         self._engine = None
 
 
-def _should_escape_percents(connection: Connection) -> bool:
-    if sqlalchemy.__version__ >= "2.0.0":
-        return False
-    return connection.engine.dialect.paramstyle in ["format", "pyformat"]
-
-
 def fetch_current_db_versions(db_url: str, schema: str) -> tuple[int, int]:
     """Return the current version and API level of the database for the
     given schema.
@@ -133,24 +127,14 @@ def update_sql(
     kwargs = {} if transaction else {"isolation_level": "AUTOCOMMIT"}
     with _EngineContext(db_url, **kwargs) as engine:
         with engine.begin() as conn:
-            _update_sql_in_conn(conn, sql, schema, version, api_level)
-
-
-def _update_sql_in_conn(
-    conn: Connection, sql: str, schema: str, version: int, api_level: int
-) -> None:
-    _execute_sql_stream(conn, sql)
-    _update_versions(conn, schema, version, api_level)
+            _execute_sql_stream(conn, sql)
+            _update_versions(conn, schema, version, api_level)
 
 
 def _execute_sql_stream(conn: Connection, sql: str) -> None:
     """Run the SQL statements in a stream against a database."""
     for query in split_sql(sql):
-        if _should_escape_percents(conn):
-            escaped_query = query.replace("%", "%%")
-        else:
-            escaped_query = query
-        conn.execute(sa_text(escaped_query))
+        conn.execute(sa_text(query))
 
 
 def _update_versions(

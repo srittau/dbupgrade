@@ -2,6 +2,8 @@
 
 Switch to Calendar Versioning (CalVer).
 
+- Fix percent characters when using SQLAlchemy 1 as well.
+
 # News in dbupgrade 2.3.3
 
 - Don't escape percent characters when using SQLAlchemy 2.
