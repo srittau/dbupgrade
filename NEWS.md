@@ -1,5 +1,7 @@
 # Unreleased Changes
 
+Drop support for Python 3.7 and 3.8.
+
 # News in dbupgrade 2023.2.0
 
 Switch to Calendar Versioning (CalVer).
