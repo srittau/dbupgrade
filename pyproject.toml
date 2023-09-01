@@ -38,7 +38,7 @@ sqlparse = ">=0.3.0"
 black = "^23.1.0"
 flake8 = "^6.0.0"
 isort = "^5.10.1"
-mypy = "~1.4.1"
+mypy = "~1.5.1"
 pytest = "*"
 pytest-mock = "^3.6.1"
 
