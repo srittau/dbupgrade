@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "dbupgrade"
-version = "2023.10.0"
+version = "2023.10.1.dev0"
 description = "Database Migration Tool"
 readme = "README.md"
 include = ["CHANGELOG.md"]
