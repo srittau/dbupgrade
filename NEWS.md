@@ -2,6 +2,10 @@
 
 Drop support for Python 3.7 and 3.8.
 
+dbupgrade is now easier to use as a library:
+  - `db_upgrade`, `VersionInfo`, `MAX_VERSION`, and `MAX_API_LEVEL` are now
+    re-exported from `dbupgrade`.
+
 # News in dbupgrade 2023.2.0
 
 Switch to Calendar Versioning (CalVer).
