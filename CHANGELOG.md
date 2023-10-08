@@ -1,4 +1,4 @@
-# Unreleased Changes
+# News in dbupgrade 2023.10.0
 
 Drop support for Python 3.7 and 3.8.
 
