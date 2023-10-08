@@ -5,6 +5,7 @@ Drop support for Python 3.7 and 3.8.
 dbupgrade is now easier to use as a library:
   - `db_upgrade`, `VersionInfo`, `MAX_VERSION`, and `MAX_API_LEVEL` are now
     re-exported from `dbupgrade`.
+  - Add a `py.typed` file to indicate that dbupgrade is a typed package.
 
 # News in dbupgrade 2023.2.0
 
