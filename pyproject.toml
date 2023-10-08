@@ -7,6 +7,7 @@ name = "dbupgrade"
 version = "2023.2.1.dev0"
 description = "Database Migration Tool"
 readme = "README.md"
+include = ["CHANGELOG.md"]
 authors = ["Sebastian Rittau <srittau@rittau.biz>"]
 license = "MIT"
 homepage = "https://github.com/srittau/dbupgrade"
@@ -27,7 +28,7 @@ dbupgrade = 'dbupgrade.main:main'
 [tool.poetry.urls]
 "GitHub" = "https://github.com/srittau/dbupgrade"
 "Bug Tracker" = "https://github.com/srittau/dbupgrade/issues"
-"Changes" = "https://github.com/srittau/dbupgrade/blob/main/NEWS.md"
+"Changes" = "https://github.com/srittau/dbupgrade/blob/main/CHANGELOG.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
