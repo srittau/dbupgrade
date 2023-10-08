@@ -45,6 +45,26 @@ pytest-mock = "^3.6.1"
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
 
+[tool.mypy]
+disallow_any_decorated = true
+disallow_any_generics = false  # TODO
+disallow_any_unimported = true
+disallow_incomplete_defs = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+extra_checks = true
+ignore_missing_imports = true  # TODO: due to sqlparse
+no_implicit_reexport = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
+show_error_codes = true
+
 [tool.black]
 line-length = 79
 
