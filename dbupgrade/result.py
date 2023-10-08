@@ -13,6 +13,10 @@ class UpgradeResult:
     failed_script: FileInfo | None = None
 
     @property
+    def was_upgraded(self) -> bool:
+        return self.old_version.version != self.new_version.version
+
+    @property
     def success(self) -> bool:
         return self.failed_script is None
 
