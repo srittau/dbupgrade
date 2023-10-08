@@ -2,11 +2,11 @@
 
 Database Migration Tool
 
-[![Python](https://img.shields.io/pypi/pyversions/dbupgrade.svg)](https://pypi.python.org/pyversions/dbupgrade/)
-[![MIT License](https://img.shields.io/pypi/l/dbupgrade.svg)](https://pypi.python.org/pypi/dbupgrade/)
-[![GitHub](https://img.shields.io/github/release/srittau/dbupgrade/all.svg)](https://github.com/srittau/dbupgrade/releases/)
+![Python](https://img.shields.io/pypi/pyversions/dbupgrade)
+![License MIT](https://img.shields.io/pypi/l/dbupgrade)
+[![GitHub Releases](https://img.shields.io/github/release/srittau/dbupgrade/all.svg)](https://github.com/srittau/dbupgrade/releases/)
 [![pypi](https://img.shields.io/pypi/v/dbupgrade.svg)](https://pypi.python.org/pypi/dbupgrade/)
-![GitHub Actions build](https://img.shields.io/github/actions/workflow/status/srittau/dbupgrade/test-and-lint.yml)
+[![GitHub Actions build](https://img.shields.io/github/actions/workflow/status/srittau/dbupgrade/test-and-lint.yml)](https://github.com/srittau/dbupgrade/actions/workflows/test-and-lint.yml)
 
 ## Basic Usage
 
