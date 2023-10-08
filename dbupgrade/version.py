@@ -12,7 +12,7 @@ MAX_API_LEVEL = 999999
 
 @dataclass
 class VersionInfo:
-    max_version: int = MAX_API_LEVEL
+    max_version: int = MAX_VERSION
     api_level: int | None = None
 
 
