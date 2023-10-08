@@ -6,7 +6,7 @@ Database Migration Tool
 [![MIT License](https://img.shields.io/pypi/l/dbupgrade.svg)](https://pypi.python.org/pypi/dbupgrade/)
 [![GitHub](https://img.shields.io/github/release/srittau/dbupgrade/all.svg)](https://github.com/srittau/dbupgrade/releases/)
 [![pypi](https://img.shields.io/pypi/v/dbupgrade.svg)](https://pypi.python.org/pypi/dbupgrade/)
-[![GitHub Actions](https://img.shields.io/github/workflow/status/srittau/dbupgrade/Test%20and%20lint)](https://github.com/srittau/dbupgrade/actions)
+![GitHub Actions build](https://img.shields.io/github/actions/workflow/status/srittau/dbupgrade/test-and-lint.yml)
 
 ## Basic Usage
 
