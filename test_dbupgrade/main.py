@@ -64,14 +64,14 @@ class TestMain:
         logging.basicConfig.assert_called_once_with(level=logging.ERROR)
 
     def test_no_json_output(
-        self, parse_args: Mock, capsys: CaptureFixture
+        self, parse_args: Mock, capsys: CaptureFixture[str]
     ) -> None:
         parse_args.return_value.json = False
         main()
         assert capsys.readouterr().out == ""
 
     def test_json_success(
-        self, parse_args: Mock, db_upgrade: Mock, capsys: CaptureFixture
+        self, parse_args: Mock, db_upgrade: Mock, capsys: CaptureFixture[str]
     ) -> None:
         parse_args.return_value.json = True
         db_upgrade.return_value = UpgradeResult(
@@ -95,7 +95,7 @@ class TestMain:
         }
 
     def test_json_error(
-        self, parse_args: Mock, db_upgrade: Mock, capsys: CaptureFixture
+        self, parse_args: Mock, db_upgrade: Mock, capsys: CaptureFixture[str]
     ) -> None:
         parse_args.return_value.json = True
         db_upgrade.return_value = UpgradeResult(
