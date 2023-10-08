@@ -31,7 +31,7 @@ dbupgrade = 'dbupgrade.main:main'
 "Changes" = "https://github.com/srittau/dbupgrade/blob/main/CHANGELOG.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9"
 sqlalchemy = ">=1.4, <3"
 sqlparse = ">=0.3.0"
 
