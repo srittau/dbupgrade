@@ -1,8 +1,18 @@
 version: 2
+
 updates:
-- package-ecosystem: pip
-  directory: "/"
-  schedule:
-    interval: monthly
-    time: '04:00'
-  open-pull-requests-limit: 1
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: monthly
+      time: '04:00'
+    groups:
+      dependencies:
+        exclude-patterns:
+          - "types-*"
+        update-types:
+          - "minor"
+          - "patch"
+      types:
+        patterns:
+          - "types-*"
