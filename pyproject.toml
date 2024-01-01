@@ -36,10 +36,10 @@ sqlalchemy = ">=1.4, <3"
 sqlparse = ">=0.3.0"
 
 [tool.poetry.dev-dependencies]
-black = "^23.11.0"
+black = "^23.12.1"
 flake8 = "^6.0.0"
-isort = "^5.10.1"
-mypy = "~1.7.1"
+isort = "^5.13.2"
+mypy = "~1.8.0"
 pytest = "*"
 pytest-mock = "^3.6.1"
 
