@@ -39,9 +39,9 @@ sqlparse = ">=0.3.0"
 black = "^24.3.0"
 flake8 = "^7.0.0"
 isort = "^5.13.2"
-mypy = "~1.8.0"
+mypy = "~1.9.0"
 pytest = "*"
-pytest-mock = "^3.6.1"
+pytest-mock = "^3.14.0"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
