@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
       fail-fast: false
 
     steps:
@@ -22,7 +22,6 @@ jobs:
       - name: Install Python packages
         run: poetry install
       - name: Lint with flake8
-        if: ${{ matrix.python-version >= '3.8' }}
         run: |
           poetry run flake8 --version
           poetry run flake8 --show-source --statistics dbupgrade test_dbupgrade
@@ -38,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
       fail-fast: false
 
     steps:
