@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, text as sa_text
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import SQLAlchemyError
 
-from dbupgrade.sql import split_sql
+from .sql import split_sql
 
 if TYPE_CHECKING:
     from sqlalchemy import Row

@@ -70,3 +70,8 @@ line-length = 79
 
 [tool.ruff.lint]
 select = ["E", "F", "B", "I"]
+# E501: line too long (handled by ruff formatter)
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true

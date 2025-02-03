@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 
 from .files import FileInfo
-
-from dbupgrade.version import VersionMatcher
+from .version import VersionMatcher
 
 
 @dataclass

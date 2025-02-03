@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .args import Arguments
 from .files import FileInfo
-
-from dbupgrade.args import Arguments
 
 MAX_VERSION = 999999
 MAX_API_LEVEL = 999999
