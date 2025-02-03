@@ -1,17 +1,29 @@
+[project]
+name = "dbupgrade"
+version = "2023.10.1.dev0"
+description = "Database Migration Tool"
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "Sebastian Rittau", email = "srittau@rittau.biz" }]
+dynamic = ["classifiers"]
+
+[project.urls]
+homepage = "https://github.com/srittau/dbupgrade"
+repository = "https://github.com/srittau/dbupgrade"
+"GitHub" = "https://github.com/srittau/dbupgrade"
+"Bug Tracker" = "https://github.com/srittau/dbupgrade/issues"
+"Changes" = "https://github.com/srittau/dbupgrade/blob/main/CHANGELOG.md"
+
+[project.scripts]
+dbupgrade = 'dbupgrade.main:main'
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "dbupgrade"
-version = "2023.10.1.dev0"
-description = "Database Migration Tool"
-readme = "README.md"
 include = ["CHANGELOG.md"]
-authors = ["Sebastian Rittau <srittau@rittau.biz>"]
-license = "MIT"
-homepage = "https://github.com/srittau/dbupgrade"
-repository = "https://github.com/srittau/dbupgrade"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -21,14 +33,6 @@ classifiers = [
     "Topic :: Software Development",
 ]
 packages = [{ include = "dbupgrade" }]
-
-[tool.poetry.scripts]
-dbupgrade = 'dbupgrade.main:main'
-
-[tool.poetry.urls]
-"GitHub" = "https://github.com/srittau/dbupgrade"
-"Bug Tracker" = "https://github.com/srittau/dbupgrade/issues"
-"Changes" = "https://github.com/srittau/dbupgrade/blob/main/CHANGELOG.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9"
