@@ -17,13 +17,13 @@ class TestFileInfo:
         fi1 = FileInfo("", "schema1", "postgres", 4, 0)
         fi2 = FileInfo("", "schema2", "postgres", 5, 0)
         with pytest.raises(TypeError):
-            fi1 < fi2
+            fi1 < fi2  # noqa: B015
 
     def test_lt__non_matching_dialects(self) -> None:
         fi1 = FileInfo("", "schema", "postgres", 4, 0)
         fi2 = FileInfo("", "schema", "mysql", 5, 0)
         with pytest.raises(TypeError):
-            fi1 < fi2
+            fi1 < fi2  # noqa: B015
 
     def test_repr(self) -> None:
         fi = FileInfo("/foo/bar", "myschema", "postgres", 123, 13)

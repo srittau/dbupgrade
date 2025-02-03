@@ -82,9 +82,7 @@ class TestFetchCurrentDBVersions:
         create_engine: Mock,
         expected_query: str,
     ) -> None:
-        execute = (
-            create_engine.return_value.begin.return_value.__enter__.return_value.execute
-        )
+        execute = create_engine.return_value.begin.return_value.__enter__.return_value.execute
         assert any(
             str(c[0][0]) == expected_query for c in execute.call_args_list
         )

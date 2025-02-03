@@ -35,13 +35,11 @@ python = ">=3.9"
 sqlalchemy = ">=1.4, <3"
 sqlparse = ">=0.3.0"
 
-[tool.poetry.dev-dependencies]
-black = "^24.10.0"
-flake8 = "^7.1.1"
-isort = "^5.13.2"
+[tool.poetry.group.dev.dependencies]
 mypy = "~1.14.1"
 pytest = "*"
 pytest-mock = "^3.14.0"
+ruff = "^0.9.4"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
@@ -56,7 +54,7 @@ disallow_untyped_calls = true
 disallow_untyped_decorators = true
 disallow_untyped_defs = true
 extra_checks = true
-ignore_missing_imports = true  # TODO: due to sqlparse
+ignore_missing_imports = true      # TODO: due to sqlparse
 no_implicit_reexport = true
 strict_equality = true
 warn_redundant_casts = true
@@ -66,16 +64,9 @@ warn_unused_configs = true
 warn_unused_ignores = true
 show_error_codes = true
 
-[tool.black]
+[tool.ruff]
+target-version = "py39"
 line-length = 79
 
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-combine_as_imports = true
-line_length = 79
-known_dbupgrade = "dbupgrade"
-known_test = "test_dbupgrade"
-sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER,DBUPGRADE,TEST"
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
