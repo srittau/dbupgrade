@@ -40,10 +40,10 @@ sqlalchemy = ">=1.4, <3"
 sqlparse = ">=0.3.0"
 
 [tool.poetry.group.dev.dependencies]
-mypy = "~1.14.1"
+mypy = "~1.15.0"
 pytest = "*"
 pytest-mock = "^3.14.0"
-ruff = "^0.9.4"
+ruff = "^0.11.7"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
