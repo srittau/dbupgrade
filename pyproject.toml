@@ -4,9 +4,16 @@ version = "2023.10.1.dev0"
 description = "Database Migration Tool"
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.9"
 authors = [{ name = "Sebastian Rittau", email = "srittau@rittau.biz" }]
-dynamic = ["classifiers"]
+requires-python = ">=3.9"
+dependencies = ["sqlalchemy >= 1.4, <3", "sqlparse >= 0.3.0"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Topic :: Database",
+    "Topic :: Software Development",
+]
 
 [project.urls]
 homepage = "https://github.com/srittau/dbupgrade"
@@ -24,19 +31,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 include = ["CHANGELOG.md"]
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Environment :: Console",
-    "Intended Audience :: Developers",
-    "Topic :: Database",
-    "Topic :: Software Development",
-]
 packages = [{ include = "dbupgrade" }]
-
-[tool.poetry.dependencies]
-python = ">=3.9"
-sqlalchemy = ">=1.4, <3"
-sqlparse = ">=0.3.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "~1.15.0"
