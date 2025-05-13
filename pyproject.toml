@@ -1,6 +1,6 @@
 [project]
 name = "dbupgrade"
-version = "2025.5.0"
+version = "2025.5.1.dev0"
 description = "Database Migration Tool"
 license = "MIT"
 readme = "README.md"

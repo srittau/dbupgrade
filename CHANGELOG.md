@@ -1,5 +1,7 @@
 # Changelog for dbupgrade
 
+## [Unreleased]
+
 ## [2025.5.0] - 2025-05-13
 
 ### Added
