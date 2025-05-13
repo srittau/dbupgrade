@@ -2,7 +2,7 @@
 
 Database Migration Tool
 
-![Python](https://img.shields.io/pypi/pyversions/dbupgrade)
+![Python Version](https://img.shields.io/pypi/pyversions/dbupgrade)
 ![License MIT](https://img.shields.io/pypi/l/dbupgrade)
 [![GitHub Releases](https://img.shields.io/github/release/srittau/dbupgrade/all.svg)](https://github.com/srittau/dbupgrade/releases/)
 [![pypi](https://img.shields.io/pypi/v/dbupgrade.svg)](https://pypi.python.org/pypi/dbupgrade/)
