@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Sequence
+from collections.abc import Iterable
 
 from .apply import apply_files
 from .db import fetch_current_db_versions
@@ -52,12 +52,12 @@ def create_filter(
     return version, api_level, Filter(schema, dialect, matcher)
 
 
-def read_files_to_apply(script_path: str, filter_: Filter) -> List[FileInfo]:
+def read_files_to_apply(script_path: str, filter_: Filter) -> list[FileInfo]:
     files = parse_sql_files(collect_sql_files(script_path))
     return filter_files(files, filter_)
 
 
-def filter_files(files: Sequence[FileInfo], filter_: Filter) -> List[FileInfo]:
+def filter_files(files: Iterable[FileInfo], filter_: Filter) -> list[FileInfo]:
     matching = [f for f in files if filter_.matches(f)]
     matching.sort()
     return matching

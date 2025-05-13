@@ -1,6 +1,5 @@
 import os.path
 from os import listdir
-from typing import List
 
 
 class FileInfo:
@@ -34,7 +33,7 @@ class FileInfo:
         )
 
 
-def collect_sql_files(directory: str) -> List[str]:
+def collect_sql_files(directory: str) -> list[str]:
     return [
         os.path.join(directory, fn)
         for fn in listdir(directory)

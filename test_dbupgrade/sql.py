@@ -1,10 +1,8 @@
-from typing import List
-
 from dbupgrade.sql import split_sql
 
 
 class TestSplitSQL:
-    def _call_string(self, s: str) -> List[str]:
+    def _call_string(self, s: str) -> list[str]:
         return list(split_sql(s))
 
     def test_empty_stream(self) -> None:

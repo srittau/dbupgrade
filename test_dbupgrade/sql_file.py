@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 import os.path
 from io import StringIO
-from typing import TextIO
+from typing import TYPE_CHECKING
 from unittest.mock import ANY, call, mock_open, patch
 
 import pytest
 
 from dbupgrade.files import FileInfo
 from dbupgrade.sql_file import ParseError, parse_sql_files, parse_sql_stream
+
+if TYPE_CHECKING:
+    from _typeshed import SupportsRead
 
 
 class TestParseSQLFiles:
@@ -19,7 +24,7 @@ class TestParseSQLFiles:
     def test_parse(self) -> None:
         file_info = self._create_file_info()
 
-        def my_parse_stream(stream: TextIO, _: str) -> FileInfo:
+        def my_parse_stream(stream: SupportsRead[str], _: str) -> FileInfo:
             assert stream.read() == "file content"
             return file_info
 

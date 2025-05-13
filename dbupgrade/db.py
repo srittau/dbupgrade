@@ -59,7 +59,7 @@ class _EngineContext:
         self._engine = create_engine(self._db_url, future=True, **self._kwargs)
         return self._engine
 
-    def __exit__(self, _: Any, __: Any, ___: Any) -> None:
+    def __exit__(self, *args: object) -> None:
         assert self._engine is not None
         self._engine.dispose()
         self._engine = None

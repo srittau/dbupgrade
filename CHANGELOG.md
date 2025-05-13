@@ -8,6 +8,10 @@
 - Re-export `UpgradeResult` and `VersionResult` from `dbupgrade`.
 - Add `UpgradeResult.was_upgraded` property.
 
+### Removed
+
+- Drop support for Python 3.9.
+
 ## [2023.10.0]
 
 ### Added

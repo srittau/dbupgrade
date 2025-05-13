@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import sqlite3
-from collections.abc import Generator
+from collections.abc import Generator, Iterable
 from tempfile import NamedTemporaryFile
-from typing import Any, Sequence, cast
+from typing import Any, cast
 from unittest.mock import MagicMock, Mock, _Call, call
 
 import pytest
@@ -151,11 +151,10 @@ class TestUpdateSQL:
         create_engine.return_value.dialect.paramstyle = paramstyle
 
     def _assert_execute_has_calls(
-        self, execute_mock: Mock, expected_queries: Sequence[_Call]
+        self, execute_mock: Mock, expected_queries: Iterable[_Call]
     ) -> None:
-        assert len(execute_mock.call_args_list) == len(expected_queries)
         for expected_call, true_call in zip(
-            expected_queries, execute_mock.call_args_list
+            expected_queries, execute_mock.call_args_list, strict=True
         ):
             assert len(true_call) == 2, f"unexpected call: {true_call!r}"
             query = str(true_call[0][0])

@@ -1,7 +1,7 @@
 import logging
 import os.path
 import re
-from typing import Dict, Iterable, List, Sequence
+from collections.abc import Iterable
 
 from dbupgrade.files import FileInfo
 
@@ -10,7 +10,7 @@ class ParseError(Exception):
     pass
 
 
-def parse_sql_files(files: Sequence[str]) -> List[FileInfo]:
+def parse_sql_files(files: Iterable[str]) -> list[FileInfo]:
     file_infos = []
     for fn in files:
         try:
@@ -46,7 +46,7 @@ _line_re = re.compile(
 )
 
 
-def _parse_sql_headers(stream: Iterable[str]) -> Dict[str, str]:
+def _parse_sql_headers(stream: Iterable[str]) -> dict[str, str]:
     matches = []
     for line in stream:
         m = _line_re.match(line)
@@ -56,7 +56,7 @@ def _parse_sql_headers(stream: Iterable[str]) -> Dict[str, str]:
     return dict((m.group(1).lower(), m.group(2).strip()) for m in matches)
 
 
-def _bool_header(headers: Dict[str, str], header_name: str) -> bool:
+def _bool_header(headers: dict[str, str], header_name: str) -> bool:
     _BOOL_VALUES = {"yes": True, "no": False}
 
     try:
@@ -67,7 +67,7 @@ def _bool_header(headers: Dict[str, str], header_name: str) -> bool:
         ) from None
 
 
-def _int_header(headers: Dict[str, str], header_name: str) -> int:
+def _int_header(headers: dict[str, str], header_name: str) -> int:
     try:
         return int(headers[header_name])
     except ValueError:

@@ -1,5 +1,4 @@
 import re
-from typing import List
 
 import sqlparse
 
@@ -9,7 +8,7 @@ _SQL_DELIMITER_RE = re.compile(r"^\s*delimiter\s*(.+)$", re.IGNORECASE)
 _PLACEHOLDER = "\ufffc"
 
 
-def split_sql(sql: str) -> List[str]:
+def split_sql(sql: str) -> list[str]:
     """Return an iterator over the SQL statements in a stream.
 
     >>> list(split_sql("SELECT * FROM foo; DELETE FROM foo;"))
@@ -27,7 +26,7 @@ def split_sql(sql: str) -> List[str]:
 def _escape_delimiters(sql: str) -> str:
     if _PLACEHOLDER in sql:
         raise ValueError("unexpected placeholder value in SQL string")
-    new_lines: List[str] = []
+    new_lines: list[str] = []
     delimiter = ""
     for line in sql.splitlines():
         m = _SQL_DELIMITER_RE.match(line)
