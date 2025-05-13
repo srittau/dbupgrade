@@ -51,12 +51,13 @@ The following headers are required:
 
 The database must contain a table `db_config` with three columns: `schema`,
 `version`, and `api_level`. If this table does not exist, it is created.
-This table must contain exactly one row for the given schema. If this row
-does not exist, it is created with version and api_level initially set to 0.
+This table must contain exactly one row for the given schema. If the row
+does not exist, it will be created with the `version` and `api_level` columns
+initially set to 0.
 
-The current version and API level of the schema are requested from the
-database and all scripts with a higher version number are applied, in order.
-If there are any version numbers missing, the script will stop after the
+The current version and API level of the schema are retrieved from the
+database, and all scripts with a higher version number are applied in order.
+If any version numbers are missing, the script will stop after the
 last version before the missing version.
 
 Unless the `-l` or `-L` option is supplied, only scripts that do not
@@ -64,14 +65,14 @@ increase the API level will be applied. If the `-l` option is given, all
 scripts up to the given API level will be applied. `-L` will apply all
 scripts without regard to the API level.
 
-Each script is executed in a seperate transaction. If a script fails, all
-changes in that script will be rolled back and the script will stop with
-an error message and a non-zero return status.
+Each script is executed in a separate transaction. If a script fails, all
+changes made by that script will be rolled back, and the script will terminate
+with an error message and a non-zero return status.
 
 ## JSON Output
 
-When supplying the `--json` option, `dbupgrade` will information about the
-applied scripts as JSON to the standard output. Sample output:
+When supplying the `--json` option, `dbupgrade` will print information about
+the applied scripts as JSON to the standard output. Sample output:
 
 ```json
 {
@@ -104,7 +105,7 @@ applied scripts as JSON to the standard output. Sample output:
 }
 ```
 
-`success` is `true` if all scripts were applied successfully or no scripts
-were to be applied. In this case, the `failedScript` key is not defined.
-The `appliedScripts` key is always defined. In case no scripts were applied,
-it's an empty array.
+The `success` key is `true` if all scripts were applied successfully or if no
+scripts needed to be applied. In this case, the `failedScript` key is not
+included. The `appliedScripts` key is always present and contains an array
+of applied scripts. If no scripts were applied, this array is empty.
