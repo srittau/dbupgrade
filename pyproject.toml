@@ -2,7 +2,7 @@
 name = "dbupgrade"
 version = "2023.10.1.dev0"
 description = "Database Migration Tool"
-license = { text = "MIT" }
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [{ name = "Sebastian Rittau", email = "srittau@rittau.biz" }]
@@ -28,7 +28,6 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Topic :: Database",
     "Topic :: Software Development",
 ]
