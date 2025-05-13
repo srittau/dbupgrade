@@ -29,6 +29,7 @@ jobs:
         run: |
           poetry run mypy --version
           poetry run mypy dbupgrade test_dbupgrade
+        if: matrix.python-version != '3.14-dev'  # will be fixed in mypy 1.16
       - name: Test with pytest
         run: poetry run pytest
 
@@ -37,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14-dev"]
       fail-fast: false
 
     steps:
