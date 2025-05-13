@@ -20,7 +20,7 @@ scripts from `DIRECTORY`. `DIRECTORY` is searched for all files with the
 -- Schema: my-db-schema
 -- Version: 25
 -- API-Level: 3
--- Dialect: postgres
+-- Dialect: postgresql
 
 CREATE TABLE ...
 ```
@@ -31,7 +31,9 @@ The following headers are required:
    Name of the schema to update.
 - **Dialect**  
    Database dialect of this script. Use SQLalchemy's database
-  URL scheme identifier, e.g. `postgres` or `sqlite`.
+  URL dialect identifier, e.g. `postgresql` or `sqlite`, but do not include
+  the driver used to connect to the database. E.g. use `postgresql` instead of
+  `postgresql+psycopg`.
 - **Version**  
    The new version of the schema after this script was applied.
   It is an error if two scripts have the same schema, dialect, and version.
