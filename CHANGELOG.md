@@ -1,8 +1,10 @@
 # Unreleased Changes
 
-Add `UpgradeResult.was_upgraded` property.
+- Add support for Python through 3.14.
 
-Re-export `UpgradeResult` and `VersionResult` from `dbupgrade`.
+- Add `UpgradeResult.was_upgraded` property.
+
+- Re-export `UpgradeResult` and `VersionResult` from `dbupgrade`.
 
 # News in dbupgrade 2023.10.0
 
