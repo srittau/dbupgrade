@@ -34,10 +34,10 @@ include = ["CHANGELOG.md"]
 packages = [{ include = "dbupgrade" }]
 
 [tool.poetry.group.dev.dependencies]
-mypy = "~1.15.0"
+mypy = "~1.16.0"
 pytest = "*"
-pytest-mock = "^3.14.0"
-ruff = "^0.11.7"
+pytest-mock = "^3.14.1"
+ruff = "^0.11.12"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
