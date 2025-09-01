@@ -37,7 +37,7 @@ packages = [{ include = "dbupgrade" }]
 mypy = "~1.17.1"
 pytest = "*"
 pytest-mock = "^3.14.1"
-ruff = "^0.12.7"
+ruff = "^0.12.11"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
