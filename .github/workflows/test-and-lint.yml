@@ -8,52 +8,47 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14-dev"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
       fail-fast: false
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - uses: astral-sh/setup-uv@v7
+        name: Install uv
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install poetry
-        run: pip --disable-pip-version-check install -U poetry
       - name: Install Python packages
-        run: poetry install
+        run: uv sync --locked
       - name: Lint with ruff
         run: |
-          poetry run ruff --version
-          poetry run ruff check
+          uv run ruff --version
+          uv run ruff check
       - name: Type checking with mypy
         run: |
-          poetry run mypy --version
-          poetry run mypy dbupgrade test_dbupgrade
-        if: matrix.python-version != '3.14-dev'  # will be fixed in mypy 1.16
+          uv run mypy --version
+          uv run mypy dbupgrade test_dbupgrade
       - name: Test with pytest
-        run: poetry run pytest
+        run: uv run pytest
 
   test14:
     name: Test against SQLAlchemy 1.4
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14-dev"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
       fail-fast: false
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - uses: astral-sh/setup-uv@v7
+        name: Install uv
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install poetry
-        run: pip --disable-pip-version-check install -U poetry
       - name: Install Python packages
         run: |
-          poetry install
-          poetry add SQLAlchemy==^1.4
+          uv sync --locked
+          uv add SQLAlchemy==^1.4
       - name: Test with pytest
         env:
           SQLALCHEMY_WARN_20: true
-        run: poetry run pytest
+        run: uv run pytest
