@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add support for Python 3.15.
+
 ### Removed
 
 - Drop support for SQLAlchemy 1.4.
