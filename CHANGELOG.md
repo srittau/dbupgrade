@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Removed
+
+- Drop support for SQLAlchemy 1.4.
+
 ## [2025.5.0] - 2025-05-13
 
 ### Added

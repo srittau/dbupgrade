@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    name: Test against SQLAlchemy 2
+    name: Test and lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,27 +28,4 @@ jobs:
           uv run mypy --version
           uv run mypy dbupgrade test_dbupgrade
       - name: Test with pytest
-        run: uv run pytest
-
-  test14:
-    name: Test against SQLAlchemy 1.4
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-      fail-fast: false
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: astral-sh/setup-uv@v7
-        name: Install uv
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Python packages
-        run: |
-          uv sync --locked
-          uv add SQLAlchemy==^1.4
-      - name: Test with pytest
-        env:
-          SQLALCHEMY_WARN_20: true
         run: uv run pytest
