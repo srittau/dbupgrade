@@ -1,6 +1,6 @@
 # Changelog for dbupgrade
 
-## [Unreleased]
+## Unreleased
 
 ### Added
 
@@ -10,7 +10,7 @@
 
 - Drop support for SQLAlchemy 1.4.
 
-## [2025.5.0] - 2025-05-13
+## 2025.5.0 – 2025-05-13
 
 ### Added
 
@@ -22,7 +22,7 @@
 
 - Drop support for Python 3.9.
 
-## [2023.10.0]
+## 2023.10.0
 
 ### Added
 
@@ -35,7 +35,7 @@
 
 Drop support for Python 3.7 and 3.8.
 
-## [2023.2.0]
+## 2023.2.0
 
 Switch to Calendar Versioning (CalVer).
 
@@ -43,57 +43,57 @@ Switch to Calendar Versioning (CalVer).
 
 - Fix percent characters when using SQLAlchemy 1 as well.
 
-## [2.3.3]
+## 2.3.3
 
 ### Fixed
 
 - Don't escape percent characters when using SQLAlchemy 2.
 
-## [2.3.2]
+## 2.3.2
 
 ### Added
 
 - Make compatible with SQLAlchemy 2.
 
-## [2.3.1]
+## 2.3.1
 
 ### Changed
 
 - Improve forwards compatibility with SQLAlchemy 2.
 
-## [2.3.0]
+## 2.3.0
 
 ### Added
 
 - Add a `--json` option to print update information in JSON format.
 
-## [2.2.0]
+## 2.2.0
 
 ### Changed
 
 - Return with exit code 1 when encountering an SQL error.
 
-## [2.1.1]
+## 2.1.1
 
 ### Fixed
 
 - Print proper error message, instead of a traceback when encountering
   an SQL error.
 
-## [2.1.0]
+## 2.1.0
 
 ### Added
 
 - Add `dbupgrade.__main__`. `dbupgrade` can now be executed using
   `python3 -m dbupgrade`.
 
-## [2.0.1]
+## 2.0.1
 
 ### Fixed
 
 - Fix a warning about isolation_level when using `-- Transaction: no`.
 
-## [2.0.0]
+## 2.0.0
 
 ### Changed
 
@@ -105,13 +105,13 @@ Switch to Calendar Versioning (CalVer).
 
 - Drop support for Python 3.5 and 3.6.
 
-## [1.0.0]
+## 1.0.0
 
 ### Added
 
 - Add `--quiet` option.
 
-## [0.2.2]
+## 0.2.2
 
 ### Changed
 
@@ -122,13 +122,13 @@ Switch to Calendar Versioning (CalVer).
 
 - Fix escaping of percent signs.
 
-## [0.2.1]
+## 0.2.1
 
 ### Added
 
 - Python 3.5 compatibility.
 
-## [0.2.0]
+## 0.2.0
 
 ### Added
 
