@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.10"
 
 [options]
-exclude-newer = "2026-08-13T11:46:23.802693572Z"
+exclude-newer = "2026-08-13T11:50:37.409678107Z"
 exclude-newer-span = "P5D"
 
 [options.exclude-newer-package]
@@ -20,7 +20,7 @@ wheels = [
 
 [[package]]
 name = "dbupgrade"
-version = "2026.8.0.dev0"
+version = "2026.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "sqlalchemy" },

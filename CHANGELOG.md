@@ -1,6 +1,6 @@
 # Changelog for dbupgrade
 
-## Unreleased
+## 2026.8.0 – 2026-08-18
 
 ### Added
 
