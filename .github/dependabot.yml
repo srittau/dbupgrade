@@ -16,3 +16,11 @@ updates:
       types:
         patterns:
           - "types-*"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: '04:00'
+    cooldown:
+      default-days: 5
