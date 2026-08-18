@@ -5,7 +5,7 @@ description = "Database Migration Tool"
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
-authors = [{ name = "Sebastian Rittau", email = "srittau@rittau.biz" }]
+authors = [{ name = "Sebastian Rittau", email = "sebastian.rittau@zfutura.de" }]
 requires-python = ">=3.10"
 dependencies = ["sqlalchemy >= 2.0.51, <3", "sqlparse >= 0.6.0"]
 classifiers = [
