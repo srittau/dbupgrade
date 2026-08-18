@@ -1,6 +1,6 @@
 [project]
 name = "dbupgrade"
-version = "2026.8.0"
+version = "2026.8.1.dev0"
 description = "Database Migration Tool"
 license = "MIT"
 license-files = ["LICENSE"]
