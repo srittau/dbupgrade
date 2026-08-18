@@ -1,19 +1,23 @@
 version: 2
 
 updates:
-  - package-ecosystem: pip
+  - package-ecosystem: uv
     directory: "/"
     schedule:
       interval: monthly
       time: '04:00'
+    cooldown:
+      default-days: 5
     groups:
       dependencies:
+        applies-to: version-updates
         exclude-patterns:
           - "types-*"
         update-types:
           - "minor"
           - "patch"
       types:
+        applies-to: version-updates
         patterns:
           - "types-*"
 
