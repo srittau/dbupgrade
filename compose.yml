@@ -1,0 +1,16 @@
+services:
+  2026.8.0:
+    image: srittau/dbupgrade:2026.8.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: 2026.8.0
+
+  latest:
+    image: srittau/dbupgrade:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: 2026.8.0

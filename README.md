@@ -112,3 +112,54 @@ The `success` key is `true` if all scripts were applied successfully or if no
 scripts needed to be applied. In this case, the `failedScript` key is not
 included. The `appliedScripts` key is always present and contains an array
 of applied scripts. If no scripts were applied, this array is empty.
+
+## Docker Image
+
+A Docker image, `srittau/dbupgrade`, is available for running `dbupgrade`
+directly.
+
+### Ad-Hoc Usage
+
+Mount the directory of migration scripts into the container at
+`/app/migrations`, then pass the database URL and the schema as arguments:
+
+```console
+$ docker run --rm -v /path/to/migrations:/app/migrations \
+    srittau/dbupgrade:latest postgresql://user:pass@host/db myschema
+```
+
+Any additional `dbupgrade` options (e.g. `-q`, `--json`) can be appended
+after these arguments.
+
+### Custom Images
+
+For repeated use, e.g. in a deployment pipeline, it is also possible to
+build a custom image on top of `srittau/dbupgrade` that already contains
+your migration scripts. Such an image only needs the database URL when run.
+
+```dockerfile
+FROM srittau/dbupgrade:latest
+RUN uv pip install psycopg[binary]
+ENV DBUPGRADE_SCHEMA=myschema
+COPY migrations/ /app/migrations/
+```
+
+The base image does not include a database driver, so install the one
+matching your database (here, `psycopg` for PostgreSQL).
+
+Build and run it:
+
+```console
+$ docker build -t my-app-migrations .
+$ docker run --rm my-app-migrations postgresql://user:pass@host/db
+```
+
+The schema set with `DBUPGRADE_SCHEMA` is used by default, but can be
+overridden by passing a schema name after the database URL:
+
+```console
+$ docker run --rm my-app-migrations postgresql://user:pass@host/db otherschema
+```
+
+Additional `dbupgrade` options can be appended after the database URL (and
+optional schema).
