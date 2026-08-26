@@ -10,11 +10,12 @@ Database Migration Tool
 
 ## Basic Usage
 
-Usage: `dbupgrade [OPTIONS] [-l API_LEVEL|-L] DBNAME SCHEMA DIRECTORY`
+Usage: `dbupgrade [OPTIONS] [-l API_LEVEL|-L] SCHEMA DB-URL SCRIPT-PATH`
 
-Upgrade the given `SCHEMA` in the database specified as `DBNAME` with SQL
-scripts from `DIRECTORY`. `DIRECTORY` is searched for all files with the
-`.sql` suffix. These files are SQL scripts with a special header sections:
+Upgrade the given `SCHEMA` in the database specified as `DB-URL` with SQL
+migration scripts from `SCRIPT-PATH`. `SCRIPT-PATH` is searched for all files
+with the `.sql` suffix. These files are SQL scripts with a special header
+sections:
 
 ```sql
 -- Schema: my-db-schema
