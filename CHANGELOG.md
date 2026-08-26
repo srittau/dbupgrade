@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changes
+
+- When running `dbupgrade --help`, meta vars are properly upper cased.
+
 ## 2026.8.0 – 2026-08-18
 
 ### Added

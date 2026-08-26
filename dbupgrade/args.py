@@ -40,10 +40,16 @@ def parse_args(argv: Sequence[str]) -> Arguments:
     parser = ArgumentParser(
         prog=argv[0], description="upgrade a database schema"
     )
-    parser.add_argument("schema", help="database schema to upgrade")
-    parser.add_argument("db_url", help="URL of the database to upgrade")
     parser.add_argument(
-        "script_path", help="directory that contains the SQL scripts"
+        "schema", metavar="SCHEMA", help="database schema to upgrade"
+    )
+    parser.add_argument(
+        "db_url", metavar="DB-URL", help="URL of the database to upgrade"
+    )
+    parser.add_argument(
+        "script_path",
+        metavar="SCRIPT-PATH",
+        help="directory that contains the SQL scripts",
     )
     parser.add_argument(
         "-q",
@@ -58,7 +64,11 @@ def parse_args(argv: Sequence[str]) -> Arguments:
     )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
-        "-l", "--api-level", help="maximum API level to upgrade to", type=int
+        "-l",
+        "--api-level",
+        metavar="API-LEVEL",
+        help="maximum API level to upgrade to",
+        type=int,
     )
     group.add_argument(
         "-L",
@@ -67,7 +77,11 @@ def parse_args(argv: Sequence[str]) -> Arguments:
         help="upgrade all scripts no matter the API level",
     )
     parser.add_argument(
-        "-m", "--max-version", help="maximum version to upgrade to", type=int
+        "-m",
+        "--max-version",
+        metavar="MAX-VERSION",
+        help="maximum version to upgrade to",
+        type=int,
     )
     args = parser.parse_args(argv[1:])
     return arguments_from_args(args)
